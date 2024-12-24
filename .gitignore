@@ -9,7 +9,8 @@ HELP.md
 # Gradle 관련
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
 
 # IntelliJ IDEA 설정
 .idea/
