@@ -35,6 +35,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
