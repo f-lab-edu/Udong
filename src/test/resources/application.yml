@@ -2,20 +2,13 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
-  application:
-    name: udong
-  mvc:
-    view:
-      prefix: /templates/
-      suffix: .html
 
 social:
   kakao:
