@@ -25,15 +25,15 @@ public class MemberService {
                     .withNickname(member.getNickname())
                     .withProfileImageUrl(member.getProfileImageUrl());
 
-            return new MemberResponse(memberRepository.save(updatedMember));
+            return MemberResponse.fromMember(memberRepository.save(updatedMember));
         }
 
-        return new MemberResponse(memberRepository.save(member));
+        return MemberResponse.fromMember(memberRepository.save(member));
     }
 
     public MemberResponse getMemberById(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당하는 회원이 없습니다."));
 
-        return new MemberResponse(member);
+        return MemberResponse.fromMember(member);
     }
 }
