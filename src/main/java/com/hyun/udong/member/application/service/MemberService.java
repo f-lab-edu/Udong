@@ -17,7 +17,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberResponse saveOrUpdate(Member member) {
+    public MemberResponse save(Member member) {
         Optional<Member> foundMember = memberRepository.findBySocialIdAndSocialType(member.getSocialId(), member.getSocialType());
 
         if (foundMember.isPresent()) {

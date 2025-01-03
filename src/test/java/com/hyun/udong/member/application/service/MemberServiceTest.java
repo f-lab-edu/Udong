@@ -22,8 +22,8 @@ class MemberServiceTest {
 
     @BeforeEach
     void setUp() {
-        memberService.saveOrUpdate(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
-        memberService.saveOrUpdate(new Member(2L, SocialType.KAKAO, "짱아", "https://user2.com"));
+        memberService.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
+        memberService.save(new Member(2L, SocialType.KAKAO, "짱아", "https://user2.com"));
     }
 
     @Test
@@ -31,7 +31,7 @@ class MemberServiceTest {
     void saveMember() {
         Member member = new Member(3L, SocialType.KAKAO, "신영만", "https://user3.com");
 
-        MemberResponse savedMember = memberService.saveOrUpdate(member);
+        MemberResponse savedMember = memberService.save(member);
 
         MemberResponse findMember = memberService.getMemberById(savedMember.getId());
         assertAll(
@@ -46,7 +46,7 @@ class MemberServiceTest {
     void updateMember() {
         Member member = new Member(2L, SocialType.KAKAO, "짱아아", "https://user2.com");
 
-        MemberResponse updatedMember = memberService.saveOrUpdate(member);
+        MemberResponse updatedMember = memberService.save(member);
 
         MemberResponse findMember = memberService.getMemberById(updatedMember.getId());
         assertAll(
