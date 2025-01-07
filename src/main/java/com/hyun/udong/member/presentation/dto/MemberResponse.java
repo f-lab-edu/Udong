@@ -13,7 +13,7 @@ public class MemberResponse {
     private int age;
     private String profileImageUrl;
 
-    public static MemberResponse fromMember(Member member) {
+    public static MemberResponse from(Member member) {
         return new MemberResponse(member.getId(), member.getNickname(), member.getGender(), member.getAge(), member.getProfileImageUrl());
     }
 }

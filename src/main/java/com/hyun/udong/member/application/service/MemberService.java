@@ -23,15 +23,15 @@ public class MemberService {
         if (foundMember.isPresent()) {
             foundMember.get().updateProfile(member.getNickname(), member.getProfileImageUrl());
 
-            return MemberResponse.fromMember(foundMember.get());
+            return MemberResponse.from(foundMember.get());
         }
 
-        return MemberResponse.fromMember(memberRepository.save(member));
+        return MemberResponse.from(memberRepository.save(member));
     }
 
     public MemberResponse getMemberById(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당하는 회원이 없습니다."));
 
-        return MemberResponse.fromMember(member);
+        return MemberResponse.from(member);
     }
 }
