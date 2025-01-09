@@ -42,17 +42,17 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("기존 사용자일 경우 사용자 정보를 수정한다.")
+    @DisplayName("기존 사용자일 경우 사용자 정보를 반환한다.")
     void updateMember() {
-        Member member = new Member(2L, SocialType.KAKAO, "짱아아", "https://user2.com");
+        Member member = new Member(2L, SocialType.KAKAO, "짱아", "https://user2.com");
 
         MemberResponse updatedMember = memberService.save(member);
 
         MemberResponse findMember = memberService.getMemberById(updatedMember.getId());
         assertAll(
                 () -> assertThat(findMember.getId()).isEqualTo(updatedMember.getId()),
-                () -> assertThat(findMember.getNickname()).isEqualTo("짱아아"),
-                () -> assertThat(findMember.getProfileImageUrl()).isEqualTo("https://user2.com")
+                () -> assertThat(findMember.getNickname()).isEqualTo(updatedMember.getNickname()),
+                () -> assertThat(findMember.getProfileImageUrl()).isEqualTo(updatedMember.getProfileImageUrl())
         );
     }
 }

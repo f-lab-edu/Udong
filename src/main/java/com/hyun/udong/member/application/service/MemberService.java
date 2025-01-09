@@ -21,8 +21,6 @@ public class MemberService {
         Optional<Member> foundMember = memberRepository.findBySocialIdAndSocialType(member.getSocialId(), member.getSocialType());
 
         if (foundMember.isPresent()) {
-            foundMember.get().updateProfile(member.getNickname(), member.getProfileImageUrl());
-
             return MemberResponse.from(foundMember.get());
         }
 
