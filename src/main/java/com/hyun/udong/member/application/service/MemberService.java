@@ -32,4 +32,9 @@ public class MemberService {
 
         return MemberResponse.from(member);
     }
+
+    public Member findByRefreshToken(String refreshToken) {
+        return memberRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 회원이 없습니다."));
+    }
 }

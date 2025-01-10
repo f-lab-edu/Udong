@@ -27,4 +27,10 @@ public class AuthController {
         AccessTokenResponse accessToken = authService.kakaoLogin(code);
         return ResponseEntity.ok().body(accessToken);
     }
+
+    @GetMapping("/oauth/kakao/refresh")
+    public ResponseEntity<AccessTokenResponse> refreshIdToken(@RequestParam("refreshToken") final String refreshToken) {
+        AccessTokenResponse accessToken = authService.refreshTokens(refreshToken);
+        return ResponseEntity.ok().body(accessToken);
+    }
 }
