@@ -15,6 +15,10 @@ public class AuthService {
     private final KakaoOAuthClient kakaoOAuthClient;
     private final MemberService memberService;
 
+    public String getOAuthUrl() {
+        return kakaoOAuthClient.getOAuthUrl();
+    }
+
     public AccessTokenResponse kakaoLogin(String code) {
         KakaoTokenResponse kakaoTokenResponse = kakaoOAuthClient.getToken(code);
         KakaoProfileResponse profile = kakaoOAuthClient.getUserProfile(kakaoTokenResponse.getAccessToken());
