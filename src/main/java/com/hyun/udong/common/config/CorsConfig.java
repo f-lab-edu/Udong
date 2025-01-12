@@ -1,4 +1,4 @@
-package com.hyun.udong.config;
+package com.hyun.udong.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
