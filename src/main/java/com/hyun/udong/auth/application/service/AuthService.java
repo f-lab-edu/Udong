@@ -23,7 +23,9 @@ public class AuthService {
     public AccessTokenResponse kakaoLogin(String code) {
         KakaoTokenResponse kakaoTokenResponse = kakaoOAuthClient.getToken(code);
         KakaoProfileResponse profile = kakaoOAuthClient.getUserProfile(kakaoTokenResponse.getAccessToken());
-        memberService.save(profile.toMember());
+        Member member = profile.toMember();
+        member.updateRefreshToken(kakaoTokenResponse.getRefreshToken());
+        memberService.save(member);
         return new AccessTokenResponse(kakaoTokenResponse.getIdToken(), kakaoTokenResponse.getExpiresIn(), kakaoTokenResponse.getRefreshToken());
     }
 
