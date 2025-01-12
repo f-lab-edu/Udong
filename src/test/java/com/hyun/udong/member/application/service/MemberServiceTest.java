@@ -2,6 +2,7 @@ package com.hyun.udong.member.application.service;
 
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
+import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.presentation.dto.MemberResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -54,5 +56,17 @@ class MemberServiceTest {
                 () -> assertThat(findMember.getNickname()).isEqualTo(updatedMember.getNickname()),
                 () -> assertThat(findMember.getProfileImageUrl()).isEqualTo(updatedMember.getProfileImageUrl())
         );
+    }
+
+    @Test
+    @DisplayName("id로 사용자 정보를 조회했을 때 없는 사용자일 경우 예외를 발생시킨다.")
+    void getMemberByIdWithNotExists() {
+        assertThrows(MemberNotFoundException.class, () -> memberService.getMemberById(100L));
+    }
+
+    @Test
+    @DisplayName("없는 refresh token으로 사용자 정보를 조회했을 때 예외를 발생시킨다.")
+    void findByRefreshTokenWithNotExists() {
+        assertThrows(MemberNotFoundException.class, () -> memberService.findByRefreshToken(""));
     }
 }
