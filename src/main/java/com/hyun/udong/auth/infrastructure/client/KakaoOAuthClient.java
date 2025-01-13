@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class KakaoOAuthClient {
 
-    private static final String AUTHORIZE_URL = "https://kauth.kakao.com/oauth/authorize?client_id=";
     private static final String ACCESS_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private static final String USER_PROFILE_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -21,10 +20,6 @@ public class KakaoOAuthClient {
 
     @Value("${social.kakao.redirect-uri}")
     private String redirectUri;
-
-    public String getOAuthUrl() {
-        return AUTHORIZE_URL + clientId + "&redirect_uri=" + redirectUri + "&response_type=code";
-    }
 
     public KakaoProfileResponse getUserProfile(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();

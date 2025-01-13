@@ -16,11 +16,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/oauth/kakao/link")
-    public ResponseEntity<String> getOAuthUrl() {
-        String oAuthUrl = authService.getOAuthUrl();
-        return ResponseEntity.ok().body(oAuthUrl);
-    }
 
     @GetMapping("/oauth/kakao")
     public ResponseEntity<AccessTokenResponse> kakaoLogin(@RequestParam("code") final String code) {
