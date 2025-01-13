@@ -28,6 +28,8 @@ public class Member {
 
     private String profileImageUrl;
 
+    private String refreshToken;
+
     public Member(Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
         this.socialId = socialId;
         this.socialType = socialType;
@@ -38,5 +40,9 @@ public class Member {
     public void updateProfile(String nickname, String profileImageUrl) {
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

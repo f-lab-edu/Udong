@@ -16,10 +16,21 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @GetMapping("/oauth/kakao/link")
+    public ResponseEntity<String> getOAuthUrl() {
+        String oAuthUrl = authService.getOAuthUrl();
+        return ResponseEntity.ok().body(oAuthUrl);
+    }
 
-    @GetMapping("/login/kakao")
+    @GetMapping("/oauth/kakao")
     public ResponseEntity<AccessTokenResponse> kakaoLogin(@RequestParam("code") final String code) {
         AccessTokenResponse accessToken = authService.kakaoLogin(code);
+        return ResponseEntity.ok().body(accessToken);
+    }
+
+    @GetMapping("/oauth/kakao/refresh")
+    public ResponseEntity<AccessTokenResponse> refreshIdToken(@RequestParam("refreshToken") final String refreshToken) {
+        AccessTokenResponse accessToken = authService.refreshTokens(refreshToken);
         return ResponseEntity.ok().body(accessToken);
     }
 }

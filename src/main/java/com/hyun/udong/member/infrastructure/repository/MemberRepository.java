@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findBySocialIdAndSocialType(Long socialId, SocialType socialType);
+
+    Optional<Member> findByRefreshToken(String refreshToken);
 }
 

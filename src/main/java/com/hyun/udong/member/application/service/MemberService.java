@@ -1,6 +1,7 @@
 package com.hyun.udong.member.application.service;
 
 import com.hyun.udong.member.domain.Member;
+import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.member.presentation.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,6 @@ public class MemberService {
         Optional<Member> foundMember = memberRepository.findBySocialIdAndSocialType(member.getSocialId(), member.getSocialType());
 
         if (foundMember.isPresent()) {
-            foundMember.get().updateProfile(member.getNickname(), member.getProfileImageUrl());
-
             return MemberResponse.from(foundMember.get());
         }
 
@@ -30,8 +29,14 @@ public class MemberService {
     }
 
     public MemberResponse getMemberById(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당하는 회원이 없습니다."));
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
 
         return MemberResponse.from(member);
+    }
+
+    public Member findByRefreshToken(String refreshToken) {
+        return memberRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
     }
 }
