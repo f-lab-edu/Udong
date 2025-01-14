@@ -12,8 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -68,5 +67,14 @@ class MemberServiceTest {
     @DisplayName("없는 refresh token으로 사용자 정보를 조회했을 때 예외를 발생시킨다.")
     void findByRefreshTokenWithNotExists() {
         assertThrows(MemberNotFoundException.class, () -> memberService.findByRefreshToken(""));
+    }
+
+    @Test
+    @DisplayName("refresh token을 수정한다.")
+    void updateRefreshToken() {
+        Member member = memberService.save2(new Member(3L, SocialType.KAKAO, "신영만", "https://user3.com"));
+        Member updatedMember = memberService.updateRefreshToken(member.getId(), "refreshToken");
+
+        assertEquals("refreshToken", updatedMember.getRefreshToken());
     }
 }

@@ -20,6 +20,14 @@ public class KakaoProfileResponse {
 
     private KakaoAccount kakaoAccount;
 
+    public KakaoProfileResponse(Long id, String nickname, String profileImage) {
+        this.id = id;
+        this.kakaoAccount = new KakaoAccount();
+        this.kakaoAccount.profile = new KakaoAccount.Profile();
+        this.kakaoAccount.profile.nickname = nickname;
+        this.kakaoAccount.profile.profileImageUrl = profileImage;
+    }
+
     @Getter
     public static class KakaoAccount {
 

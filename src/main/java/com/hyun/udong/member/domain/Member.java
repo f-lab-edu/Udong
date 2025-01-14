@@ -37,6 +37,14 @@ public class Member {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public Member(Long id, Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
+        this.id = id;
+        this.socialId = socialId;
+        this.socialType = socialType;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+    }
+
     public void updateProfile(String nickname, String profileImageUrl) {
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
