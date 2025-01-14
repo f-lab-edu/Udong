@@ -64,7 +64,7 @@ class AuthServiceTest {
         Long memberId = 1L;
         Member member = new Member(100L, SocialType.KAKAO, "hyun", "profile_image");
         member.updateRefreshToken(refreshToken);
-        memberService.save2(member);
+        memberService.save(member);
 
         given(jwtTokenProvider.getMemberIdFromToken(refreshToken)).willReturn(memberId.toString());
         given(jwtTokenProvider.generateAccessToken(memberId)).willReturn("newAccessToken");

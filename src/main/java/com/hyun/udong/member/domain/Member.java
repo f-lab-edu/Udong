@@ -45,11 +45,6 @@ public class Member {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public void updateProfile(String nickname, String profileImageUrl) {
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-    }
-
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

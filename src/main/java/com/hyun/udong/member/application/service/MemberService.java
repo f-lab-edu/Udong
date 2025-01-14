@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -18,18 +16,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberResponse save(Member member) {
-        Optional<Member> foundMember = memberRepository.findBySocialIdAndSocialType(member.getSocialId(), member.getSocialType());
-
-        if (foundMember.isPresent()) {
-            return MemberResponse.from(foundMember.get());
-        }
-
-        return MemberResponse.from(memberRepository.save(member));
-    }
-
-    @Transactional
-    public Member save2(Member member) {
+    public Member save(Member member) {
         return memberRepository.findBySocialIdAndSocialType(member.getSocialId(), member.getSocialType())
                 .orElseGet(() -> memberRepository.save(member));
     }
@@ -43,11 +30,6 @@ public class MemberService {
 
     public Member findById(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
-    }
-
-    public Member findByRefreshToken(String refreshToken) {
-        return memberRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
     }
 
