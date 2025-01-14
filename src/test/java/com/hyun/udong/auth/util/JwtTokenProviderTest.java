@@ -1,10 +1,16 @@
 package com.hyun.udong.auth.util;
 
+import com.hyun.udong.auth.exception.ExpiredTokenException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,13 +40,6 @@ class JwtTokenProviderTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 토큰을 검증하면 false를 반환한다.")
-    void parseToken_invalidToken_returnsFalse() {
-        String token = "invalid.token";
-        assertThrows(Exception.class, () -> jwtTokenProvider.parseToken(token));
-    }
-
-    @Test
     @DisplayName("유효한 토큰에서 회원 ID를 추출하면 ID를 반환한다.")
     void getMemberIdFromToken_validToken_returnsId() {
         Long id = 1L;
@@ -54,5 +53,18 @@ class JwtTokenProviderTest {
     void getMemberIdFromToken_invalidToken_throwsException() {
         String token = "invalid.token";
         assertThrows(Exception.class, () -> jwtTokenProvider.getMemberIdFromToken(token));
+    }
+
+    @Test
+    @DisplayName("만료된 토큰을 검증하면 ExpiredTokenException을 던진다.")
+    void parseToken_expiredToken_throwsExpiredTokenException() {
+        String expiredToken = Jwts.builder()
+                .setSubject("1")
+                .setIssuedAt(new Date(System.currentTimeMillis() - 2000))
+                .setExpiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        assertThrows(ExpiredTokenException.class, () -> jwtTokenProvider.getMemberIdFromToken(expiredToken));
     }
 }
