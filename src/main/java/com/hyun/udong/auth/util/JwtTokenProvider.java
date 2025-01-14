@@ -1,7 +1,9 @@
 package com.hyun.udong.auth.util;
 
+import com.hyun.udong.auth.exception.ExpiredTokenException;
 import com.hyun.udong.auth.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,9 +54,11 @@ public class JwtTokenProvider {
         return REFRESH_TOKEN_EXPIRE_TIME;
     }
 
-    public Jws<Claims> parseToken(String token) {
+    private Jws<Claims> parseToken(String token) {
         try {
             return parserBuilder().setSigningKey(getSecretKey()).build().parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            throw ExpiredTokenException.EXCEPTION;
         } catch (Exception e) {
             throw InvalidTokenException.EXCEPTION;
         }
