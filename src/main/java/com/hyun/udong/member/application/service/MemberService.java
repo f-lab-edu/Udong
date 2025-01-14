@@ -28,6 +28,12 @@ public class MemberService {
         return MemberResponse.from(memberRepository.save(member));
     }
 
+    @Transactional
+    public Member save2(Member member) {
+        return memberRepository.findBySocialIdAndSocialType(member.getSocialId(), member.getSocialType())
+                .orElseGet(() -> memberRepository.save(member));
+    }
+
     public MemberResponse getMemberById(Long id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
@@ -35,8 +41,19 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
+    public Member findById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+    }
+
     public Member findByRefreshToken(String refreshToken) {
         return memberRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+    }
+
+    public Member updateRefreshToken(Long id, String refreshToken) {
+        Member member = findById(id);
+        member.updateRefreshToken(refreshToken);
+        return member;
     }
 }

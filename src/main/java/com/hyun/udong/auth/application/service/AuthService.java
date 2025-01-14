@@ -1,36 +1,51 @@
 package com.hyun.udong.auth.application.service;
 
 import com.hyun.udong.auth.infrastructure.client.KakaoOAuthClient;
-import com.hyun.udong.auth.presentation.dto.AccessTokenResponse;
+import com.hyun.udong.auth.presentation.dto.AuthTokens;
 import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
 import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
+import com.hyun.udong.auth.presentation.dto.LoginResponse;
+import com.hyun.udong.auth.util.JwtTokenProvider;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthService {
 
     private final KakaoOAuthClient kakaoOAuthClient;
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AccessTokenResponse kakaoLogin(String code) {
+    @Transactional
+    public LoginResponse kakaoLogin(String code) {
         KakaoTokenResponse kakaoTokenResponse = kakaoOAuthClient.getToken(code);
         KakaoProfileResponse profile = kakaoOAuthClient.getUserProfile(kakaoTokenResponse.getAccessToken());
-        Member member = profile.toMember();
-        member.updateRefreshToken(kakaoTokenResponse.getRefreshToken());
-        memberService.save(member);
-        return new AccessTokenResponse(kakaoTokenResponse.getIdToken(), kakaoTokenResponse.getExpiresIn(), kakaoTokenResponse.getRefreshToken());
+
+        Member member = memberService.save2(profile.toMember());
+
+        String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
+        memberService.updateRefreshToken(member.getId(), refreshToken);
+
+        AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getAccessTokenExpireTime(), refreshToken, jwtTokenProvider.getRefreshTokenExpireTime());
+        return new LoginResponse(member.getId(), member.getNickname(), authTokens);
     }
 
-    public AccessTokenResponse refreshTokens(String refreshToken) {
-        KakaoTokenResponse kakaoTokenResponse = kakaoOAuthClient.refreshTokens(refreshToken);
-        if (kakaoTokenResponse.getRefreshToken() != null) {
-            Member member = memberService.findByRefreshToken(refreshToken);
-            member.updateRefreshToken(kakaoTokenResponse.getRefreshToken());
-        }
-        return new AccessTokenResponse(kakaoTokenResponse.getIdToken(), kakaoTokenResponse.getExpiresIn(), refreshToken);
+    @Transactional
+    public LoginResponse refreshTokens(String refreshToken) {
+        Long memberId = Long.parseLong(jwtTokenProvider.getMemberIdFromToken(refreshToken));
+        String newAccessToken = jwtTokenProvider.generateAccessToken(memberId);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
+
+        Member member = memberService.updateRefreshToken(memberId, newRefreshToken);
+
+        AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getAccessTokenExpireTime(), newRefreshToken, jwtTokenProvider.getRefreshTokenExpireTime());
+        return new LoginResponse(member.getId(), member.getNickname(), authTokens);
+
     }
 }
