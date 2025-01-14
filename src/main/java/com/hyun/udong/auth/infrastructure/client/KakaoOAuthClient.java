@@ -56,24 +56,4 @@ public class KakaoOAuthClient {
 
         return response.getBody();
     }
-
-    public KakaoTokenResponse refreshTokens(String refreshToken) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "refresh_token");
-        params.add("client_id", clientId);
-        params.add("refresh_token", refreshToken);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(
-                ACCESS_TOKEN_URL, HttpMethod.POST, request, KakaoTokenResponse.class
-        );
-
-        return response.getBody();
-    }
 }
