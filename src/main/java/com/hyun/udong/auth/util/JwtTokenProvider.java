@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import static io.jsonwebtoken.Jwts.builder;
@@ -46,12 +48,9 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public long getAccessTokenExpireTime() {
-        return ACCESS_TOKEN_EXPIRE_TIME;
-    }
-
-    public long getRefreshTokenExpireTime() {
-        return REFRESH_TOKEN_EXPIRE_TIME;
+    public LocalDateTime getTokenExpireTime(String token) {
+        Date expiration = parseToken(token).getBody().getExpiration();
+        return LocalDateTime.ofInstant(expiration.toInstant(), ZoneId.systemDefault());
     }
 
     private Jws<Claims> parseToken(String token) {

@@ -32,7 +32,7 @@ public class AuthService {
         String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
         memberService.updateRefreshToken(member.getId(), refreshToken);
 
-        AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getAccessTokenExpireTime(), refreshToken, jwtTokenProvider.getRefreshTokenExpireTime());
+        AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getTokenExpireTime(accessToken), refreshToken, jwtTokenProvider.getTokenExpireTime(refreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
     }
 
@@ -44,7 +44,7 @@ public class AuthService {
 
         Member member = memberService.updateRefreshToken(memberId, newRefreshToken);
 
-        AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getAccessTokenExpireTime(), newRefreshToken, jwtTokenProvider.getRefreshTokenExpireTime());
+        AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getTokenExpireTime(newAccessToken), newRefreshToken, jwtTokenProvider.getTokenExpireTime(newRefreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
 
     }

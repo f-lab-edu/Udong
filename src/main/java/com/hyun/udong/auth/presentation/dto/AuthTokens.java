@@ -1,4 +1,7 @@
 package com.hyun.udong.auth.presentation.dto;
 
-public record AuthTokens(String accessToken, long accessTokenAge, String refreshToken, long refreshTokenAge) {
+import java.time.LocalDateTime;
+
+public record AuthTokens(String accessToken, LocalDateTime accessTokenExpDate, String refreshToken,
+                         LocalDateTime refreshTokenExpDate) {
 }
