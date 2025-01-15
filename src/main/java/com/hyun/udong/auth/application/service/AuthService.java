@@ -9,6 +9,8 @@ import com.hyun.udong.auth.util.JwtTokenProvider;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
+import com.hyun.udong.member.exception.MemberNotFoundException;
+import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class AuthService {
 
     private final KakaoOAuthClient kakaoOAuthClient;
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
@@ -32,7 +35,7 @@ public class AuthService {
 
         String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
         String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
-        memberService.updateRefreshToken(member.getId(), refreshToken);
+        updateRefreshToken(member.getId(), refreshToken);
 
         AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getTokenExpireTime(accessToken), refreshToken, jwtTokenProvider.getTokenExpireTime(refreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
@@ -44,10 +47,17 @@ public class AuthService {
         String newAccessToken = jwtTokenProvider.generateAccessToken(memberId);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
 
-        Member member = memberService.updateRefreshToken(memberId, newRefreshToken);
+        Member member = updateRefreshToken(memberId, newRefreshToken);
 
         AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getTokenExpireTime(newAccessToken), newRefreshToken, jwtTokenProvider.getTokenExpireTime(newRefreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
 
+    }
+
+    private Member updateRefreshToken(Long memberId, String refreshToken) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+        member.updateRefreshToken(refreshToken);
+        return memberRepository.save(member);
     }
 }

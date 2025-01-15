@@ -31,9 +31,4 @@ public class MemberService {
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
     }
 
-    public Member updateRefreshToken(Long id, String refreshToken) {
-        Member member = findById(id);
-        member.updateRefreshToken(refreshToken);
-        return member;
-    }
 }
