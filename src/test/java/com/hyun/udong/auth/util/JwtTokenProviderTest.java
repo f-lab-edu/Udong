@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,4 +68,23 @@ class JwtTokenProviderTest {
 
         assertThrows(ExpiredTokenException.class, () -> jwtTokenProvider.getMemberIdFromToken(expiredToken));
     }
+
+    @Test
+    @DisplayName("액세스 토큰과 리프레시 토큰의 만료 시간(1시간 뒤, 2주 뒤)을 검증한다.")
+    void validateTokenExpiryTimes() {
+        // given
+        Long memberId = 1L;
+        String accessToken = jwtTokenProvider.generateAccessToken(memberId);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId);
+
+        // when
+        LocalDateTime accessTokenExpireTime = jwtTokenProvider.getTokenExpireTime(accessToken);
+        LocalDateTime refreshTokenExpireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
+
+        // then
+        LocalDateTime now = LocalDateTime.now();
+        assertEquals(now.plusHours(1).withNano(0), accessTokenExpireTime.withNano(0));
+        assertEquals(now.plusDays(14).withNano(0), refreshTokenExpireTime.withNano(0));
+    }
+
 }
