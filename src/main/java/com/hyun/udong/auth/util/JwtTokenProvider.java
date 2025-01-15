@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import static io.jsonwebtoken.Jwts.builder;
 import static io.jsonwebtoken.Jwts.parserBuilder;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
 
     @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
@@ -63,6 +65,7 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             throw ExpiredTokenException.EXCEPTION;
         } catch (Exception e) {
+            log.error("검증 실패 토큰: {}", token, e);
             throw InvalidTokenException.EXCEPTION;
         }
     }
