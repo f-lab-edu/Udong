@@ -8,6 +8,7 @@ import com.hyun.udong.auth.presentation.dto.LoginResponse;
 import com.hyun.udong.auth.util.JwtTokenProvider;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
+import com.hyun.udong.member.domain.SocialType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,8 @@ public class AuthService {
         KakaoTokenResponse kakaoTokenResponse = kakaoOAuthClient.getToken(code);
         KakaoProfileResponse profile = kakaoOAuthClient.getUserProfile(kakaoTokenResponse.getAccessToken());
 
-        Member member = memberService.save(profile.toMember());
+        Member member = memberService.findBySocialIdAndSocialType(profile.getId(), SocialType.KAKAO)
+                .orElseGet(() -> memberService.save(profile.toMember()));
 
         String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
         String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
