@@ -28,3 +28,5 @@ social:
 
 jwt:
   secret: ${JWT_SECRET}
+  access-token-expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}  # 1시간 (밀리초)
+  refresh-token-expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}  # 14일 (밀리초)

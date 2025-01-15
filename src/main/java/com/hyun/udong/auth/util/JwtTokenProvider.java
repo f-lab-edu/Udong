@@ -20,8 +20,12 @@ import static io.jsonwebtoken.Jwts.parserBuilder;
 
 @Component
 public class JwtTokenProvider {
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1_000L * 60 * 60;
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1_000L * 60 * 60 * 24 * 14;
+
+    @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
+    private long accessTokenExpireTime;
+
+    @Value("${REFRESH_TOKEN_EXPIRE_TIME}")
+    private long refreshTokenExpireTime;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -34,7 +38,7 @@ public class JwtTokenProvider {
         return builder()
                 .setSubject(id.toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpireTime))
                 .signWith(getSecretKey())
                 .compact();
     }
@@ -43,7 +47,7 @@ public class JwtTokenProvider {
         return builder()
                 .setSubject(id.toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRE_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpireTime))
                 .signWith(getSecretKey())
                 .compact();
     }
