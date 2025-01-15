@@ -67,7 +67,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getMemberIdFromToken(String token) {
+    public String getSubjectFromToken(String token) {
         return parseToken(token).getBody().getSubject();
     }
 }

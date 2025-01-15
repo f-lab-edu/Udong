@@ -66,7 +66,7 @@ class AuthServiceTest {
         member.updateRefreshToken(refreshToken);
         memberService.save(member);
 
-        given(jwtTokenProvider.getMemberIdFromToken(refreshToken)).willReturn(memberId.toString());
+        given(jwtTokenProvider.getSubjectFromToken(refreshToken)).willReturn(memberId.toString());
         given(jwtTokenProvider.generateAccessToken(memberId)).willReturn("newAccessToken");
         given(jwtTokenProvider.generateRefreshToken(memberId)).willReturn("newRefreshToken");
 

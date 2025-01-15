@@ -42,18 +42,18 @@ class JwtTokenProviderTest {
 
     @Test
     @DisplayName("유효한 토큰에서 회원 ID를 추출하면 ID를 반환한다.")
-    void getMemberIdFromToken_validToken_returnsId() {
+    void getSubject() {
         Long id = 1L;
         String token = jwtTokenProvider.generateAccessToken(id);
-        String memberId = jwtTokenProvider.getMemberIdFromToken(token);
+        String memberId = jwtTokenProvider.getSubjectFromToken(token);
         assertEquals(id.toString(), memberId);
     }
 
     @Test
     @DisplayName("유효하지 않은 토큰에서 회원 ID를 추출하면 예외를 던진다.")
-    void getMemberIdFromToken_invalidToken_throwsException() {
+    void getSubjectFromToken_invalidToken_throwsException() {
         String token = "invalid.token";
-        assertThrows(Exception.class, () -> jwtTokenProvider.getMemberIdFromToken(token));
+        assertThrows(Exception.class, () -> jwtTokenProvider.getSubjectFromToken(token));
     }
 
     @Test
@@ -66,7 +66,7 @@ class JwtTokenProviderTest {
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 
-        assertThrows(ExpiredTokenException.class, () -> jwtTokenProvider.getMemberIdFromToken(expiredToken));
+        assertThrows(ExpiredTokenException.class, () -> jwtTokenProvider.getSubjectFromToken(expiredToken));
     }
 
     @Test

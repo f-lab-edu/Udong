@@ -38,7 +38,7 @@ public class AuthService {
 
     @Transactional
     public LoginResponse refreshTokens(String refreshToken) {
-        Long memberId = Long.parseLong(jwtTokenProvider.getMemberIdFromToken(refreshToken));
+        Long memberId = Long.parseLong(jwtTokenProvider.getSubjectFromToken(refreshToken));
         String newAccessToken = jwtTokenProvider.generateAccessToken(memberId);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
 
