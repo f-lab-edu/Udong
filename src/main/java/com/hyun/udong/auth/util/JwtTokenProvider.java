@@ -36,20 +36,21 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(Long id) {
+
+    public String generateAccessToken(Long id, Date issuedAt) {
         return builder()
                 .setSubject(id.toString())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpireTime))
+                .setIssuedAt(issuedAt)
+                .setExpiration(new Date(issuedAt.getTime() + accessTokenExpireTime))
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    public String generateRefreshToken(Long id) {
+    public String generateRefreshToken(Long id, Date issuedAt) {
         return builder()
                 .setSubject(id.toString())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpireTime))
+                .setIssuedAt(issuedAt)
+                .setExpiration(new Date(issuedAt.getTime() + refreshTokenExpireTime))
                 .signWith(getSecretKey())
                 .compact();
     }

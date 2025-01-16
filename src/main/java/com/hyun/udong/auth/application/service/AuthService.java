@@ -1,5 +1,6 @@
 package com.hyun.udong.auth.application.service;
 
+import com.hyun.udong.auth.exception.InvalidTokenException;
 import com.hyun.udong.auth.infrastructure.client.KakaoOAuthClient;
 import com.hyun.udong.auth.presentation.dto.AuthTokens;
 import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
@@ -14,6 +15,8 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,8 +36,8 @@ public class AuthService {
         Member member = memberService.findBySocialIdAndSocialType(profile.getId(), SocialType.KAKAO)
                 .orElseGet(() -> memberService.save(profile.toMember()));
 
-        String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
+        String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), new Date());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(), new Date());
         updateRefreshToken(member.getId(), refreshToken);
 
         AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getTokenExpireTime(accessToken), refreshToken, jwtTokenProvider.getTokenExpireTime(refreshToken));
@@ -43,15 +46,38 @@ public class AuthService {
 
     @Transactional
     public LoginResponse refreshTokens(String refreshToken) {
-        Long memberId = Long.parseLong(jwtTokenProvider.getSubjectFromToken(refreshToken));
-        String newAccessToken = jwtTokenProvider.generateAccessToken(memberId);
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
+        Long memberId = extractMemberId(refreshToken);
+
+        validateIsTokenOwner(refreshToken, memberId);
+
+        String newAccessToken = jwtTokenProvider.generateAccessToken(memberId, new Date());
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId, new Date());
 
         Member member = updateRefreshToken(memberId, newRefreshToken);
 
         AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getTokenExpireTime(newAccessToken), newRefreshToken, jwtTokenProvider.getTokenExpireTime(newRefreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
 
+    }
+
+    private long extractMemberId(String refreshToken) {
+        long memberId;
+        try {
+            memberId = Long.parseLong(jwtTokenProvider.getSubjectFromToken(refreshToken));
+        } catch (NumberFormatException e) {
+            throw InvalidTokenException.EXCEPTION;
+        }
+        return memberId;
+    }
+
+    private void validateIsTokenOwner(String refreshToken, Long memberId) {
+        Long ownerId = memberRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> InvalidTokenException.EXCEPTION)
+                .getId();
+
+        if (!ownerId.equals(memberId)) {
+            throw InvalidTokenException.EXCEPTION;
+        }
     }
 
     private Member updateRefreshToken(Long memberId, String refreshToken) {
