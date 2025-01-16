@@ -84,7 +84,7 @@ class AuthServiceTest {
 
     @DisplayName("토큰 재발급 시 유효한 코드가 아니면 예외가 발생한다.")
     @Test
-    void testMethodNameHere() {
+    void refreshTokens_throw() {
         String otherRefreshToken = jwtTokenProvider.generateRefreshToken(200L, new Date());
 
         // when & then
