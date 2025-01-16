@@ -9,7 +9,6 @@ import com.hyun.udong.auth.util.JwtTokenProvider;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
-import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,6 @@ class AuthServiceTest {
 
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private MemberRepository memberRepository;
 
     @Test
     @DisplayName("카카오 로그인 시 사용자 정보와 refresh_token이 저장된다.")
@@ -77,7 +73,7 @@ class AuthServiceTest {
         authService.refreshTokens(initialRefreshToken);
 
         // then
-        Member updatedMember = memberRepository.findById(member.getId()).orElseThrow();
+        Member updatedMember = memberService.findById(member.getId());
         then(updatedMember.getRefreshToken()).isNotEqualTo(initialRefreshToken);
     }
 
