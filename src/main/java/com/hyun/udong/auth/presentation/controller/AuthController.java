@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @GetMapping("/token/refresh")
-    public ResponseEntity<LoginResponse> refreshIdToken(@RequestParam("refreshToken") final String refreshToken) {
+    public ResponseEntity<LoginResponse> refreshTokens(@RequestParam("refreshToken") final String refreshToken) {
         LoginResponse loginResponse = authService.refreshTokens(refreshToken);
         return ResponseEntity.ok().body(loginResponse);
     }
