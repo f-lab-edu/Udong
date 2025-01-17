@@ -84,6 +84,6 @@ public class AuthService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
         member.updateRefreshToken(refreshToken);
-        return memberRepository.save(member);
+        return member;
     }
 }
