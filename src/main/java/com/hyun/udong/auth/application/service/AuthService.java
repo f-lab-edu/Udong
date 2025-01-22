@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,8 +35,8 @@ public class AuthService {
         Member member = memberService.findBySocialIdAndSocialType(profile.getId(), SocialType.KAKAO)
                 .orElseGet(() -> memberService.save(profile.toMember()));
 
-        String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), new Date());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(), new Date());
+        String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
         updateRefreshToken(member.getId(), refreshToken);
 
         AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getTokenExpireTime(accessToken), refreshToken, jwtTokenProvider.getTokenExpireTime(refreshToken));
@@ -50,14 +49,13 @@ public class AuthService {
 
         validateIsTokenOwner(refreshToken, memberId);
 
-        String newAccessToken = jwtTokenProvider.generateAccessToken(memberId, new Date());
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId, new Date());
+        String newAccessToken = jwtTokenProvider.generateAccessToken(memberId);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
 
         Member member = updateRefreshToken(memberId, newRefreshToken);
 
         AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getTokenExpireTime(newAccessToken), newRefreshToken, jwtTokenProvider.getTokenExpireTime(newRefreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
-
     }
 
     private long extractMemberId(String refreshToken) {

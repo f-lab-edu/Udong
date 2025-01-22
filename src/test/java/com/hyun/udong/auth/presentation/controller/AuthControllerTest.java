@@ -15,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Date;
-
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -65,7 +63,7 @@ class AuthControllerTest {
     void refreshTokens() throws Exception {
         // given
         Member member = memberService.save(new Member(100L, SocialType.KAKAO, "hyun", "profile_image"));
-        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(), new Date(System.currentTimeMillis() - 1000));
+        String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
 
         member.updateRefreshToken(refreshToken);
         memberService.save(member);
@@ -78,5 +76,6 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.token.accessToken").exists())
                 .andExpect(jsonPath("$.token.refreshToken").exists());
+
     }
 }

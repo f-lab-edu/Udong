@@ -28,7 +28,7 @@ class JwtTokenProviderTest {
     @DisplayName("유효한 ID로 액세스 토큰을 생성하면 토큰을 반환한다.")
     void generateAccessToken_validId_returnsToken() {
         Long id = 1L;
-        String token = jwtTokenProvider.generateAccessToken(id, new Date());
+        String token = jwtTokenProvider.generateAccessToken(id);
         assertNotNull(token);
     }
 
@@ -36,7 +36,7 @@ class JwtTokenProviderTest {
     @DisplayName("유효한 ID로 리프레시 토큰을 생성하면 토큰을 반환한다.")
     void generateRefreshToken_validId_returnsToken() {
         Long id = 1L;
-        String token = jwtTokenProvider.generateRefreshToken(id, new Date());
+        String token = jwtTokenProvider.generateRefreshToken(id);
         assertNotNull(token);
     }
 
@@ -44,7 +44,7 @@ class JwtTokenProviderTest {
     @DisplayName("유효한 토큰에서 회원 ID를 추출하면 ID를 반환한다.")
     void getSubject() {
         Long id = 1L;
-        String token = jwtTokenProvider.generateAccessToken(id, new Date());
+        String token = jwtTokenProvider.generateAccessToken(id);
         String memberId = jwtTokenProvider.getSubjectFromToken(token);
         assertEquals(id.toString(), memberId);
     }
@@ -74,8 +74,8 @@ class JwtTokenProviderTest {
     void validateTokenExpiryTimes() {
         // given
         Long memberId = 1L;
-        String accessToken = jwtTokenProvider.generateAccessToken(memberId, new Date());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId, new Date());
+        String accessToken = jwtTokenProvider.generateAccessToken(memberId);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId);
 
         // when
         LocalDateTime accessTokenExpireTime = jwtTokenProvider.getTokenExpireTime(accessToken);
