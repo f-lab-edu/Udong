@@ -84,4 +84,10 @@ public class AuthService {
         member.updateRefreshToken(refreshToken);
         return member;
     }
+
+    public Member getMemberFromToken(String token) {
+        Long memberId = Long.parseLong(jwtTokenProvider.getSubjectFromToken(token));
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> InvalidTokenException.EXCEPTION);
+    }
 }
