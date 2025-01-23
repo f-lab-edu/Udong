@@ -1,7 +1,7 @@
 package com.hyun.udong.member.domain;
 
 import com.hyun.udong.common.entity.BaseTimeEntity;
-import com.hyun.udong.travel.domain.MemberTravelSchedule;
+import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

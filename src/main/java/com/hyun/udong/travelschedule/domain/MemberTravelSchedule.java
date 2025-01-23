@@ -1,4 +1,4 @@
-package com.hyun.udong.travel.domain;
+package com.hyun.udong.travelschedule.domain;
 
 import com.hyun.udong.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;

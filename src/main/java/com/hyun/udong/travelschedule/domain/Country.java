@@ -1,4 +1,4 @@
-package com.hyun.udong.travel.domain;
+package com.hyun.udong.travelschedule.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,17 +9,14 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class City {
+public class Country {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "city_id")
+    @Column(name = "country_id")
     private Long id;
 
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "country_id", nullable = false)
-    private Country country;
-
+    private String code;
 }

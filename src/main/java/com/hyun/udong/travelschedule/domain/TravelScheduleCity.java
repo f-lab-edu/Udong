@@ -1,4 +1,4 @@
-package com.hyun.udong.travel.domain;
+package com.hyun.udong.travelschedule.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;
