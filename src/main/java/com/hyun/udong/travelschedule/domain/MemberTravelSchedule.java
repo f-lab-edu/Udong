@@ -30,9 +30,12 @@ public class MemberTravelSchedule extends BaseTimeEntity {
     private List<TravelScheduleCity> travelScheduleCities = new ArrayList<>();
 
     @Builder
-    public MemberTravelSchedule(LocalDate startDate, LocalDate endDate, List<TravelScheduleCity> travelScheduleCities) {
+    public MemberTravelSchedule(LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public void addTravelScheduleCity(List<TravelScheduleCity> travelScheduleCities) {
         this.travelScheduleCities = travelScheduleCities;
     }
 }
