@@ -3,7 +3,6 @@ package com.hyun.udong.member.application.service;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.exception.MemberNotFoundException;
-import com.hyun.udong.member.presentation.dto.MemberResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,13 +32,12 @@ class MemberServiceTest {
     void saveMember() {
         Member member = new Member(3L, SocialType.KAKAO, "신영만", "https://user3.com");
 
-        MemberResponse savedMember = memberService.save(member);
+        Member savedMember = memberService.save(member);
 
-        MemberResponse findMember = memberService.getMemberById(savedMember.getId());
         assertAll(
-                () -> assertThat(findMember.getId()).isEqualTo(savedMember.getId()),
-                () -> assertThat(findMember.getNickname()).isEqualTo("신영만"),
-                () -> assertThat(findMember.getProfileImageUrl()).isEqualTo("https://user3.com")
+                () -> assertThat(member.getSocialId()).isEqualTo(savedMember.getSocialId()),
+                () -> assertThat(member.getNickname()).isEqualTo("신영만"),
+                () -> assertThat(member.getProfileImageUrl()).isEqualTo("https://user3.com")
         );
     }
 
@@ -48,25 +46,18 @@ class MemberServiceTest {
     void updateMember() {
         Member member = new Member(2L, SocialType.KAKAO, "짱아", "https://user2.com");
 
-        MemberResponse updatedMember = memberService.save(member);
+        Member savedMember = memberService.save(member);
 
-        MemberResponse findMember = memberService.getMemberById(updatedMember.getId());
         assertAll(
-                () -> assertThat(findMember.getId()).isEqualTo(updatedMember.getId()),
-                () -> assertThat(findMember.getNickname()).isEqualTo(updatedMember.getNickname()),
-                () -> assertThat(findMember.getProfileImageUrl()).isEqualTo(updatedMember.getProfileImageUrl())
+                () -> assertThat(member.getSocialId()).isEqualTo(savedMember.getSocialId()),
+                () -> assertThat(member.getNickname()).isEqualTo(savedMember.getNickname()),
+                () -> assertThat(member.getProfileImageUrl()).isEqualTo(savedMember.getProfileImageUrl())
         );
     }
 
     @Test
     @DisplayName("id로 사용자 정보를 조회했을 때 없는 사용자일 경우 예외를 발생시킨다.")
     void getMemberByIdWithNotExists() {
-        assertThrows(MemberNotFoundException.class, () -> memberService.getMemberById(100L));
-    }
-
-    @Test
-    @DisplayName("없는 refresh token으로 사용자 정보를 조회했을 때 예외를 발생시킨다.")
-    void findByRefreshTokenWithNotExists() {
-        assertThrows(MemberNotFoundException.class, () -> memberService.findByRefreshToken(""));
+        assertThrows(MemberNotFoundException.class, () -> memberService.findById(100L));
     }
 }

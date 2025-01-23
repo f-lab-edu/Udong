@@ -26,4 +26,8 @@ public class KakaoTokenResponse {
     private Integer refreshTokenExpiresIn;
 
     private String scope;
+
+    public KakaoTokenResponse(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

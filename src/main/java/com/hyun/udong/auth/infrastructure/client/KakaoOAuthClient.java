@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class KakaoOAuthClient {
 
-    private static final String AUTHORIZE_URL = "https://kauth.kakao.com/oauth/authorize?client_id=";
     private static final String ACCESS_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private static final String USER_PROFILE_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -21,10 +20,6 @@ public class KakaoOAuthClient {
 
     @Value("${social.kakao.redirect-uri}")
     private String redirectUri;
-
-    public String getOAuthUrl() {
-        return AUTHORIZE_URL + clientId + "&redirect_uri=" + redirectUri + "&response_type=code";
-    }
 
     public KakaoProfileResponse getUserProfile(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
@@ -53,26 +48,6 @@ public class KakaoOAuthClient {
         params.add("client_id", clientId);
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(
-                ACCESS_TOKEN_URL, HttpMethod.POST, request, KakaoTokenResponse.class
-        );
-
-        return response.getBody();
-    }
-
-    public KakaoTokenResponse refreshTokens(String refreshToken) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "refresh_token");
-        params.add("client_id", clientId);
-        params.add("refresh_token", refreshToken);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(
