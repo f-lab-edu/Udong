@@ -7,6 +7,7 @@ import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
 import com.hyun.udong.travelschedule.domain.TravelScheduleCity;
 import com.hyun.udong.travelschedule.exception.CityNotFoundException;
+import com.hyun.udong.travelschedule.exception.MemberTravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.travelschedule.infrastructure.repository.TravelScheduleRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
@@ -47,6 +48,17 @@ public class TravelScheduleService {
 
         member.registerTravelSchedule(travelSchedule);
 
+        return travelSchedule;
+    }
+
+    public MemberTravelSchedule findTravelSchedule(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+
+        MemberTravelSchedule travelSchedule = member.getTravelSchedule();
+        if (travelSchedule == null) {
+            throw MemberTravelScheduleNotFoundException.EXCEPTION;
+        }
         return travelSchedule;
     }
 }

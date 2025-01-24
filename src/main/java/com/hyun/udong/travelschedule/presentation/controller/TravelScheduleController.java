@@ -8,10 +8,7 @@ import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +22,13 @@ public class TravelScheduleController {
             @LoginMember Member member,
             @RequestBody TravelScheduleRequest travelScheduleRequest) {
         MemberTravelSchedule travelSchedule = travelScheduleService.registerTravelSchedule(member.getId(), travelScheduleRequest);
+        TravelScheduleResponse response = TravelScheduleResponse.from(travelSchedule);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/schedule")
+    public ResponseEntity<TravelScheduleResponse> getTravelSchedule(@LoginMember Member member) {
+        MemberTravelSchedule travelSchedule = travelScheduleService.findTravelSchedule(member.getId());
         TravelScheduleResponse response = TravelScheduleResponse.from(travelSchedule);
         return ResponseEntity.ok(response);
     }

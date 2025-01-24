@@ -26,7 +26,7 @@ public class MemberTravelSchedule extends BaseTimeEntity {
 
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "travelSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "travelSchedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TravelScheduleCity> travelScheduleCities = new ArrayList<>();
 
     @Builder
