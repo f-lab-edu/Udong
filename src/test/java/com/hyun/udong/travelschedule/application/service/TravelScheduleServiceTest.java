@@ -6,12 +6,15 @@ import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
 import com.hyun.udong.travelschedule.exception.CityNotFoundException;
+import com.hyun.udong.travelschedule.exception.MemberTravelScheduleNotFoundException;
+import com.hyun.udong.travelschedule.infrastructure.repository.TravelScheduleRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,12 +26,16 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 class TravelScheduleServiceTest {
 
     public static final long FIRST_MEMBER_ID = 1L;
+    public static final long NOT_EXIST_MEMBER_ID = 2L;
 
     @Autowired
     private MemberRepository memberRepository;
 
     @Autowired
     private TravelScheduleService travelScheduleService;
+
+    @Autowired
+    TravelScheduleRepository travelScheduleRepository;
 
     @BeforeEach
     void setUp() {
@@ -80,5 +87,49 @@ class TravelScheduleServiceTest {
         // when & then
         thenThrownBy(() -> travelScheduleService.registerTravelSchedule(memberId, request))
                 .isInstanceOf(CityNotFoundException.class);
+    }
+
+    @DisplayName("유효한 회원 ID로 여행 일정을 조회한다.")
+    @Test
+    @Transactional
+    void findTravelSchedule_ok() {
+        // given
+        Long memberId = 1L;
+        TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
+        travelScheduleService.registerTravelSchedule(FIRST_MEMBER_ID, request);
+
+        // when
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+        MemberTravelSchedule travelSchedule = member.getTravelSchedule();
+
+        // then
+        then(travelSchedule).isNotNull();
+        then(travelSchedule.getStartDate()).isEqualTo(request.getStartDate());
+        then(travelSchedule.getEndDate()).isEqualTo(request.getEndDate());
+        then(travelSchedule.getTravelScheduleCities()).hasSize(request.getCityIds().size());
+    }
+
+    @DisplayName("존재하지 않는 회원 ID로 여행 일정을 조회할 때 예외가 발생한다.")
+    @Test
+    void findTravelSchedule_noMember_throw() {
+        // given
+        Long memberId = 999L;
+
+        // when & then
+        thenThrownBy(() -> travelScheduleService.findTravelSchedule(memberId))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @DisplayName("회원의 여행 일정이 없을 때 예외가 발생한다.")
+    @Test
+    void findTravelSchedule_noTravelSchedule_throw() {
+        // given
+        Member member = new Member(2L, SocialType.KAKAO, "hyun", "profile_image");
+        memberRepository.save(member);
+
+        // when & then
+        thenThrownBy(() -> travelScheduleService.findTravelSchedule(NOT_EXIST_MEMBER_ID))
+                .isInstanceOf(MemberTravelScheduleNotFoundException.class);
     }
 }
