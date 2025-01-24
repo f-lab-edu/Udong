@@ -1,5 +1,6 @@
 package com.hyun.udong.travelschedule.presentation.dto;
 
+import com.hyun.udong.common.annotation.DateFormat;
 import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +13,12 @@ import java.util.stream.Collectors;
 @Builder
 public class TravelScheduleResponse {
 
+    @DateFormat
     private LocalDate startDate;
+
+    @DateFormat
     private LocalDate endDate;
+
     private List<TravelScheduleCityResponse> travelScheduleCities;
 
     @Getter
