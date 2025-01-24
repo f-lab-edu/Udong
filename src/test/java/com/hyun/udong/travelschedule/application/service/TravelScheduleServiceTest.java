@@ -7,7 +7,6 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
 import com.hyun.udong.travelschedule.exception.CityNotFoundException;
 import com.hyun.udong.travelschedule.exception.MemberTravelScheduleNotFoundException;
-import com.hyun.udong.travelschedule.infrastructure.repository.TravelScheduleRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +32,6 @@ class TravelScheduleServiceTest {
 
     @Autowired
     private TravelScheduleService travelScheduleService;
-
-    @Autowired
-    TravelScheduleRepository travelScheduleRepository;
 
     @BeforeEach
     void setUp() {
