@@ -54,7 +54,7 @@ public class Member extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public void registerTravelSchedule(MemberTravelSchedule travelSchedule) {
+    public void updateTravelSchedule(MemberTravelSchedule travelSchedule) {
         this.travelSchedule = travelSchedule;
     }
 }

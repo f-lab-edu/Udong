@@ -45,12 +45,12 @@ class TravelScheduleServiceTest {
 
     @DisplayName("유효한 회원 ID와 유효한 요청으로 여행 일정을 등록한다.")
     @Test
-    void registerTravelSchedule_validMemberAndRequest() {
+    void updateTravelSchedule_validMemberAndRequest() {
         // given
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
 
         // when
-        MemberTravelSchedule travelSchedule = travelScheduleService.registerTravelSchedule(FIRST_MEMBER_ID, request);
+        MemberTravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request);
 
         // then
         then(travelSchedule).isNotNull();
@@ -61,19 +61,19 @@ class TravelScheduleServiceTest {
 
     @DisplayName("존재하지 않는 회원 ID로 여행 일정을 등록할 때 예외가 발생한다.")
     @Test
-    void registerTravelSchedule_invalidMemberId() {
+    void updateTravelSchedule_invalidMemberId() {
         // given
         Long memberId = 999L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
 
         // when & then
-        thenThrownBy(() -> travelScheduleService.registerTravelSchedule(memberId, request))
+        thenThrownBy(() -> travelScheduleService.updateTravelSchedule(memberId, request))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
     @DisplayName("존재하지 않는 도시 ID로 여행 일정을 등록할 때 예외가 발생한다.")
     @Test
-    void registerTravelSchedule_invalidCityId() {
+    void updateTravelSchedule_invalidCityId() {
         // given
         Long memberId = 1L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 999L);
@@ -81,7 +81,7 @@ class TravelScheduleServiceTest {
         memberRepository.save(member);
 
         // when & then
-        thenThrownBy(() -> travelScheduleService.registerTravelSchedule(memberId, request))
+        thenThrownBy(() -> travelScheduleService.updateTravelSchedule(memberId, request))
                 .isInstanceOf(CityNotFoundException.class);
     }
 
@@ -92,7 +92,7 @@ class TravelScheduleServiceTest {
         // given
         Long memberId = 1L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
-        travelScheduleService.registerTravelSchedule(FIRST_MEMBER_ID, request);
+        travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request);
 
         // when
         Member member = memberRepository.findById(memberId)

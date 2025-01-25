@@ -27,7 +27,7 @@ public class TravelScheduleService {
     private final CityRepository cityRepository;
 
     @Transactional
-    public MemberTravelSchedule registerTravelSchedule(Long memberId, TravelScheduleRequest request) {
+    public MemberTravelSchedule updateTravelSchedule(Long memberId, TravelScheduleRequest request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
 
@@ -46,7 +46,7 @@ public class TravelScheduleService {
         travelSchedule.addTravelScheduleCity(travelScheduleCities);
         travelScheduleRepository.save(travelSchedule);
 
-        member.registerTravelSchedule(travelSchedule);
+        member.updateTravelSchedule(travelSchedule);
 
         return travelSchedule;
     }

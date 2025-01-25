@@ -55,7 +55,7 @@ class TravelScheduleControllerTest {
     }
 
     @Test
-    void registerTravelSchedule_ReturnsOk() throws Exception {
+    void updateTravelSchedule_ReturnsOk() throws Exception {
         mockMvc.perform(post("/travel/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -68,7 +68,7 @@ class TravelScheduleControllerTest {
     }
 
     @Test
-    void registerTravelSchedule_WithNullRequest_ReturnsBadRequest() throws Exception {
+    void updateTravelSchedule_WithNullRequest_ReturnsBadRequest() throws Exception {
         mockMvc.perform(post("/travel/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", accessToken))

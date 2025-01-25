@@ -18,10 +18,10 @@ public class TravelScheduleController {
     private final TravelScheduleService travelScheduleService;
 
     @PostMapping("/schedule")
-    public ResponseEntity<TravelScheduleResponse> registerTravelSchedule(
+    public ResponseEntity<TravelScheduleResponse> updateTravelSchedule(
             @LoginMember Member member,
             @RequestBody TravelScheduleRequest travelScheduleRequest) {
-        MemberTravelSchedule travelSchedule = travelScheduleService.registerTravelSchedule(member.getId(), travelScheduleRequest);
+        MemberTravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(member.getId(), travelScheduleRequest);
         TravelScheduleResponse response = TravelScheduleResponse.from(travelSchedule);
         return ResponseEntity.ok(response);
     }
