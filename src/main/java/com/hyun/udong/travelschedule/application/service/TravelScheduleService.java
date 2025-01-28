@@ -6,7 +6,6 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
 import com.hyun.udong.travelschedule.domain.TravelScheduleCity;
-import com.hyun.udong.travelschedule.exception.CityNotFoundException;
 import com.hyun.udong.travelschedule.exception.MemberTravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.travelschedule.infrastructure.repository.TravelScheduleRepository;
@@ -36,14 +35,11 @@ public class TravelScheduleService {
                 .endDate(request.getEndDate())
                 .build();
 
-        List<TravelScheduleCity> travelScheduleCities = request.getCityIds().stream()
-                .map(cityId -> {
-                    City city = cityRepository.findById(cityId)
-                            .orElseThrow(() -> CityNotFoundException.EXCEPTION);
-                    return new TravelScheduleCity(travelSchedule, city);
-                })
+        List<City> cities = cityRepository.findAllById(request.getCityIds());
+        List<TravelScheduleCity> travelScheduleCities = cities.stream()
+                .map(city -> new TravelScheduleCity(travelSchedule, city))
                 .toList();
-        travelSchedule.addTravelScheduleCity(travelScheduleCities);
+        travelSchedule.addTravelScheduleCities(travelScheduleCities);
         travelScheduleRepository.save(travelSchedule);
 
         member.updateTravelSchedule(travelSchedule);

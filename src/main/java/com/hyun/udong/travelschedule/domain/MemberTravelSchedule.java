@@ -35,7 +35,7 @@ public class MemberTravelSchedule extends BaseTimeEntity {
         this.endDate = endDate;
     }
 
-    public void addTravelScheduleCity(List<TravelScheduleCity> travelScheduleCities) {
+    public void addTravelScheduleCities(List<TravelScheduleCity> travelScheduleCities) {
         this.travelScheduleCities = travelScheduleCities;
     }
 }
