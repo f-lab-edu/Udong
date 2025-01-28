@@ -1,77 +1,68 @@
 package com.hyun.udong.travelschedule.presentation.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hyun.udong.auth.oauth.MockArgumentResolver;
-import com.hyun.udong.travelschedule.application.service.TravelScheduleService;
+import com.hyun.udong.auth.oauth.TestOauth;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
 @Sql("/member.sql")
 class TravelScheduleControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private TravelScheduleRequest request;
-
-    private String accessToken;
-
-    @Autowired
-    private TravelScheduleService travelScheduleService;
+    @LocalServerPort
+    private int port;
 
     @BeforeEach
     void setUp() {
-        accessToken = "Bearer mockToken";
-        request = new TravelScheduleRequest(
+        RestAssured.port = port;
+    }
+
+    @Test
+    void updateTravelSchedule_ReturnsOk() {
+        TravelScheduleRequest request = new TravelScheduleRequest(
                 LocalDate.of(2025, 1, 25),
                 LocalDate.of(2025, 2, 10),
                 List.of(1L, 2L));
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new TravelScheduleController(travelScheduleService))
-                .setCustomArgumentResolvers(new MockArgumentResolver(null))
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
-                .build();
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .body(request)
+
+                .when()
+                .post("/travel/schedule")
+
+                .then().log().all()
+                .statusCode(200)
+                .body("startDate", equalTo(String.valueOf(request.getStartDate())))
+                .body("endDate", equalTo(String.valueOf(request.getEndDate())))
+                .body("travelScheduleCities[0].cityId", equalTo(1))
+                .body("travelScheduleCities[1].cityId", equalTo(2));
     }
 
     @Test
-    void updateTravelSchedule_ReturnsOk() throws Exception {
-        mockMvc.perform(post("/travel/schedule")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header("Authorization", accessToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.startDate").value(String.valueOf(request.getStartDate())))
-                .andExpect(jsonPath("$.endDate").value(String.valueOf(request.getEndDate())))
-                .andExpect(jsonPath("$.travelScheduleCities[0].cityId").value(1L))
-                .andExpect(jsonPath("$.travelScheduleCities[1].cityId").value(2L));
-    }
+    void updateTravelSchedule_WithNullRequest_ReturnsBadRequest() {
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
 
-    @Test
-    void updateTravelSchedule_WithNullRequest_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/travel/schedule")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", accessToken))
-                .andExpect(status().isBadRequest());
+                .when()
+                .post("/travel/schedule")
+
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }
