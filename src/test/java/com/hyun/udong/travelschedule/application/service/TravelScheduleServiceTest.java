@@ -25,7 +25,6 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 class TravelScheduleServiceTest {
 
     public static final long FIRST_MEMBER_ID = 1L;
-    public static final long NOT_EXIST_MEMBER_ID = 2L;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -120,12 +119,8 @@ class TravelScheduleServiceTest {
     @DisplayName("회원의 여행 일정이 없을 때 예외가 발생한다.")
     @Test
     void findTravelSchedule_noTravelSchedule_throw() {
-        // given
-        Member member = new Member(2L, SocialType.KAKAO, "hyun", "profile_image");
-        memberRepository.save(member);
-
         // when & then
-        thenThrownBy(() -> travelScheduleService.findTravelSchedule(NOT_EXIST_MEMBER_ID))
+        thenThrownBy(() -> travelScheduleService.findTravelSchedule(FIRST_MEMBER_ID))
                 .isInstanceOf(MemberTravelScheduleNotFoundException.class);
     }
 }
