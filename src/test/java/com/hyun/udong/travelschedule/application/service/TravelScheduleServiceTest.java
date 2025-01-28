@@ -9,7 +9,6 @@ import com.hyun.udong.travelschedule.exception.CityNotFoundException;
 import com.hyun.udong.travelschedule.exception.TravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,9 +41,8 @@ class TravelScheduleServiceTest {
         return new TravelScheduleRequest(LocalDate.now(), LocalDate.now().plusDays(5), List.of(cityIds));
     }
 
-    @DisplayName("유효한 회원 ID와 유효한 요청으로 여행 일정을 등록한다.")
     @Test
-    void updateTravelSchedule_validMemberAndRequest() {
+    void 유효한_회원_ID와_유효한_요청으로_여행_일정을_등록한다() {
         // given
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
 
@@ -58,9 +56,8 @@ class TravelScheduleServiceTest {
         then(travelSchedule.getTravelScheduleCities().get(1).getCity().getName()).isEqualTo("Busan");
     }
 
-    @DisplayName("존재하지 않는 회원 ID로 여행 일정을 등록할 때 예외가 발생한다.")
     @Test
-    void updateTravelSchedule_invalidMemberId() {
+    void 존재하지_않는_회원_ID로_여행_일정을_등록할_때_예외가_발생한다() {
         // given
         Long memberId = 999L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
@@ -70,9 +67,8 @@ class TravelScheduleServiceTest {
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
-    @DisplayName("존재하지 않는 도시 ID로 여행 일정을 등록할 때 예외가 발생한다.")
     @Test
-    void updateTravelSchedule_invalidCityId() {
+    void 존재하지_않는_도시_ID로_여행_일정을_등록할_때_예외가_발생한다() {
         // given
         Long memberId = 1L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 999L);
@@ -84,10 +80,9 @@ class TravelScheduleServiceTest {
                 .isInstanceOf(CityNotFoundException.class);
     }
 
-    @DisplayName("유효한 회원 ID로 여행 일정을 조회한다.")
     @Test
     @Transactional
-    void findTravelSchedule_ok() {
+    void 유효한_회원_ID로_여행_일정을_조회한다() {
         // given
         Long memberId = 1L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
@@ -105,9 +100,8 @@ class TravelScheduleServiceTest {
         then(travelSchedule.getTravelScheduleCities()).hasSize(request.getCityIds().size());
     }
 
-    @DisplayName("존재하지 않는 회원 ID로 여행 일정을 조회할 때 예외가 발생한다.")
     @Test
-    void findTravelSchedule_noMember_throw() {
+    void 존재하지_않는_회원_ID로_여행_일정을_조회할_때_예외가_발생한다() {
         // given
         Long memberId = 999L;
 
@@ -116,9 +110,8 @@ class TravelScheduleServiceTest {
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
-    @DisplayName("회원의 여행 일정이 없을 때 예외가 발생한다.")
     @Test
-    void findTravelSchedule_noTravelSchedule_throw() {
+    void 회원의_여행_일정이_없을_때_예외가_발생한다() {
         // when & then
         thenThrownBy(() -> travelScheduleService.findTravelSchedule(FIRST_MEMBER_ID))
                 .isInstanceOf(TravelScheduleNotFoundException.class);

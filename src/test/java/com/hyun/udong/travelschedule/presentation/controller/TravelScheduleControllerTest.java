@@ -29,7 +29,7 @@ class TravelScheduleControllerTest {
     }
 
     @Test
-    void updateTravelSchedule_ReturnsOk() {
+    void 여행_일정_업데이트_성공시_OK_반환한다() {
         TravelScheduleRequest request = new TravelScheduleRequest(
                 LocalDate.of(2025, 1, 25),
                 LocalDate.of(2025, 2, 10),
@@ -53,7 +53,7 @@ class TravelScheduleControllerTest {
     }
 
     @Test
-    void updateTravelSchedule_WithNullRequest_ReturnsBadRequest() {
+    void null_요청으로_여행_일정_업데이트시_BAD_REQUEST_반환한다() {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
