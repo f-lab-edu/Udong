@@ -43,13 +43,6 @@ public class Member extends BaseTimeEntity {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public static Member createForTest(Long id, String nickname) {
-        Member member = new Member();
-        member.id = id;
-        member.nickname = nickname;
-        return member;
-    }
-
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
