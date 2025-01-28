@@ -3,7 +3,7 @@ package com.hyun.udong.travelschedule.presentation.controller;
 import com.hyun.udong.common.annotation.LoginMember;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.travelschedule.application.service.TravelScheduleService;
-import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
+import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +21,14 @@ public class TravelScheduleController {
     public ResponseEntity<TravelScheduleResponse> updateTravelSchedule(
             @LoginMember Member member,
             @RequestBody TravelScheduleRequest travelScheduleRequest) {
-        MemberTravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(member.getId(), travelScheduleRequest);
+        TravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(member.getId(), travelScheduleRequest);
         TravelScheduleResponse response = TravelScheduleResponse.from(travelSchedule);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/schedule")
     public ResponseEntity<TravelScheduleResponse> getTravelSchedule(@LoginMember Member member) {
-        MemberTravelSchedule travelSchedule = travelScheduleService.findTravelSchedule(member.getId());
+        TravelSchedule travelSchedule = travelScheduleService.findTravelSchedule(member.getId());
         TravelScheduleResponse response = TravelScheduleResponse.from(travelSchedule);
         return ResponseEntity.ok(response);
     }

@@ -4,9 +4,9 @@ import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
-import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
+import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.exception.CityNotFoundException;
-import com.hyun.udong.travelschedule.exception.MemberTravelScheduleNotFoundException;
+import com.hyun.udong.travelschedule.exception.TravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +49,7 @@ class TravelScheduleServiceTest {
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
 
         // when
-        MemberTravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request);
+        TravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request);
 
         // then
         then(travelSchedule).isNotNull();
@@ -96,7 +96,7 @@ class TravelScheduleServiceTest {
         // when
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
-        MemberTravelSchedule travelSchedule = member.getTravelSchedule();
+        TravelSchedule travelSchedule = member.getTravelSchedule();
 
         // then
         then(travelSchedule).isNotNull();
@@ -121,6 +121,6 @@ class TravelScheduleServiceTest {
     void findTravelSchedule_noTravelSchedule_throw() {
         // when & then
         thenThrownBy(() -> travelScheduleService.findTravelSchedule(FIRST_MEMBER_ID))
-                .isInstanceOf(MemberTravelScheduleNotFoundException.class);
+                .isInstanceOf(TravelScheduleNotFoundException.class);
     }
 }

@@ -4,10 +4,10 @@ import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.City;
-import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
+import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.domain.TravelScheduleCity;
 import com.hyun.udong.travelschedule.exception.CityNotFoundException;
-import com.hyun.udong.travelschedule.exception.MemberTravelScheduleNotFoundException;
+import com.hyun.udong.travelschedule.exception.TravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.travelschedule.infrastructure.repository.TravelScheduleRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
@@ -27,11 +27,11 @@ public class TravelScheduleService {
     private final CityRepository cityRepository;
 
     @Transactional
-    public MemberTravelSchedule updateTravelSchedule(Long memberId, TravelScheduleRequest request) {
+    public TravelSchedule updateTravelSchedule(Long memberId, TravelScheduleRequest request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
 
-        MemberTravelSchedule travelSchedule = MemberTravelSchedule.builder()
+        TravelSchedule travelSchedule = TravelSchedule.builder()
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .build();
@@ -51,13 +51,13 @@ public class TravelScheduleService {
         return travelSchedule;
     }
 
-    public MemberTravelSchedule findTravelSchedule(Long memberId) {
+    public TravelSchedule findTravelSchedule(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
 
-        MemberTravelSchedule travelSchedule = member.getTravelSchedule();
+        TravelSchedule travelSchedule = member.getTravelSchedule();
         if (travelSchedule == null) {
-            throw MemberTravelScheduleNotFoundException.EXCEPTION;
+            throw TravelScheduleNotFoundException.EXCEPTION;
         }
         return travelSchedule;
     }

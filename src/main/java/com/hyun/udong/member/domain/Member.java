@@ -1,7 +1,7 @@
 package com.hyun.udong.member.domain;
 
 import com.hyun.udong.common.entity.BaseTimeEntity;
-import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
+import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +34,7 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private MemberTravelSchedule travelSchedule;
+    private TravelSchedule travelSchedule;
 
     public Member(Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
         this.socialId = socialId;
@@ -47,7 +47,7 @@ public class Member extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public void updateTravelSchedule(MemberTravelSchedule travelSchedule) {
+    public void updateTravelSchedule(TravelSchedule travelSchedule) {
         this.travelSchedule = travelSchedule;
     }
 }

@@ -18,14 +18,14 @@ public class TravelScheduleCity {
 
     @ManyToOne
     @JoinColumn(name = "travel_schedule_id", nullable = false)
-    private MemberTravelSchedule travelSchedule;
+    private TravelSchedule travelSchedule;
 
     @ManyToOne
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
     @Builder
-    public TravelScheduleCity(MemberTravelSchedule travelSchedule, City city) {
+    public TravelScheduleCity(TravelSchedule travelSchedule, City city) {
         this.travelSchedule = travelSchedule;
         this.city = city;
     }

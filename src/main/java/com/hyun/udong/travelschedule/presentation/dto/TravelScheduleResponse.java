@@ -1,7 +1,7 @@
 package com.hyun.udong.travelschedule.presentation.dto;
 
 import com.hyun.udong.common.annotation.DateFormat;
-import com.hyun.udong.travelschedule.domain.MemberTravelSchedule;
+import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -28,7 +28,7 @@ public class TravelScheduleResponse {
         private String cityName;
     }
 
-    public static TravelScheduleResponse from(MemberTravelSchedule travelSchedule) {
+    public static TravelScheduleResponse from(TravelSchedule travelSchedule) {
         return TravelScheduleResponse.builder()
                 .startDate(travelSchedule.getStartDate())
                 .endDate(travelSchedule.getEndDate())

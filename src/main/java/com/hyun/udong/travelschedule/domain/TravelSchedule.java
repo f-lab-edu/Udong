@@ -15,7 +15,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class MemberTravelSchedule extends BaseTimeEntity {
+public class TravelSchedule extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class MemberTravelSchedule extends BaseTimeEntity {
     private List<TravelScheduleCity> travelScheduleCities = new ArrayList<>();
 
     @Builder
-    public MemberTravelSchedule(LocalDate startDate, LocalDate endDate) {
+    public TravelSchedule(LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
     }
