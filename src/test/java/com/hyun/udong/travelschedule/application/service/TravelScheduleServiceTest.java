@@ -1,12 +1,10 @@
 package com.hyun.udong.travelschedule.application.service;
 
+import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
-import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.TravelSchedule;
-import com.hyun.udong.travelschedule.exception.CityNotFoundException;
-import com.hyun.udong.travelschedule.exception.TravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +62,8 @@ class TravelScheduleServiceTest {
 
         // when & then
         thenThrownBy(() -> travelScheduleService.updateTravelSchedule(memberId, request))
-                .isInstanceOf(MemberNotFoundException.class);
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 회원이 존재하지 않습니다.");
     }
 
     @Test
@@ -76,8 +75,9 @@ class TravelScheduleServiceTest {
         memberRepository.save(member);
 
         // when & then
-        thenThrownBy(() -> travelScheduleService.updateTravelSchedule(memberId, request))
-                .isInstanceOf(CityNotFoundException.class);
+        thenThrownBy(() -> travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 도시가 존재하지 않습니다.");
     }
 
     @Test
@@ -90,7 +90,7 @@ class TravelScheduleServiceTest {
 
         // when
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+                .orElseThrow(() -> new NotFoundException("해당 회원이 존재하지 않습니다."));
         TravelSchedule travelSchedule = member.getTravelSchedule();
 
         // then
@@ -107,13 +107,19 @@ class TravelScheduleServiceTest {
 
         // when & then
         thenThrownBy(() -> travelScheduleService.findTravelSchedule(memberId))
-                .isInstanceOf(MemberNotFoundException.class);
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 회원이 존재하지 않습니다.");
     }
 
     @Test
     void 회원의_여행_일정이_없을_때_예외가_발생한다() {
+        // given
+        Member member = new Member(2L, SocialType.KAKAO, "dong", "profile_image");
+        memberRepository.save(member);
+
         // when & then
-        thenThrownBy(() -> travelScheduleService.findTravelSchedule(FIRST_MEMBER_ID))
-                .isInstanceOf(TravelScheduleNotFoundException.class);
+        thenThrownBy(() -> travelScheduleService.findTravelSchedule(member.getId()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("여행 일정이 존재하지 않습니다.");
     }
 }

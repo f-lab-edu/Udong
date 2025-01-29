@@ -1,16 +1,16 @@
 package com.hyun.udong.member.application.service;
 
+import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
-import com.hyun.udong.member.exception.MemberNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -52,6 +52,8 @@ class MemberServiceTest {
 
     @Test
     void id로_사용자_정보를_조회했을_때_없는_사용자일_경우_예외를_발생시킨다() {
-        assertThrows(MemberNotFoundException.class, () -> memberService.findById(100L));
+        assertThatThrownBy(() -> memberService.findById(100L))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 회원이 존재하지 않습니다.");
     }
 }

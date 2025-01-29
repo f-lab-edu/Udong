@@ -7,10 +7,10 @@ import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
 import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
 import com.hyun.udong.auth.presentation.dto.LoginResponse;
 import com.hyun.udong.auth.util.JwtTokenProvider;
+import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
-import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -80,7 +80,7 @@ public class AuthService {
 
     private Member updateRefreshToken(Long memberId, String refreshToken) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+                .orElseThrow(() -> new NotFoundException("해당하는 회원이 존재하지 않습니다."));
         member.updateRefreshToken(refreshToken);
         return member;
     }

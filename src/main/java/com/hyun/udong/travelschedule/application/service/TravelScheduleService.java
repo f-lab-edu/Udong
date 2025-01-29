@@ -1,13 +1,11 @@
 package com.hyun.udong.travelschedule.application.service;
 
+import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.member.domain.Member;
-import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.domain.TravelScheduleCity;
-import com.hyun.udong.travelschedule.exception.CityNotFoundException;
-import com.hyun.udong.travelschedule.exception.TravelScheduleNotFoundException;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.travelschedule.infrastructure.repository.TravelScheduleRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
@@ -29,7 +27,7 @@ public class TravelScheduleService {
     @Transactional
     public TravelSchedule updateTravelSchedule(Long memberId, TravelScheduleRequest request) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+                .orElseThrow(() -> new NotFoundException("해당 회원이 존재하지 않습니다."));
 
         TravelSchedule travelSchedule = TravelSchedule.builder()
                 .startDate(request.getStartDate())
@@ -38,7 +36,7 @@ public class TravelScheduleService {
 
         List<City> cities = cityRepository.findAllById(request.getCityIds());
         if (cities.size() != request.getCityIds().size()) {
-            throw CityNotFoundException.EXCEPTION;
+            throw new NotFoundException("해당 도시가 존재하지 않습니다.");
         }
         List<TravelScheduleCity> travelScheduleCities = cities.stream()
                 .map(city -> new TravelScheduleCity(travelSchedule, city))
@@ -53,11 +51,11 @@ public class TravelScheduleService {
 
     public TravelSchedule findTravelSchedule(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+                .orElseThrow(() -> new NotFoundException("해당 회원이 존재하지 않습니다."));
 
         TravelSchedule travelSchedule = member.getTravelSchedule();
         if (travelSchedule == null) {
-            throw TravelScheduleNotFoundException.EXCEPTION;
+            throw new NotFoundException("여행 일정이 존재하지 않습니다.");
         }
         return travelSchedule;
     }
