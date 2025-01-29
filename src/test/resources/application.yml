@@ -27,6 +27,6 @@ social:
 
 jwt:
   secret: udongudongudongudongudongudongudong123
-  access-token-expire-time: 3600000
-  refresh-token-expire-time: 1209600000
+  access-token-expire-time: 123123
+  refresh-token-expire-time: 123123
 
