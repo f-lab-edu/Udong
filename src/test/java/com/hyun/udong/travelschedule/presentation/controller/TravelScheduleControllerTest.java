@@ -1,7 +1,7 @@
 package com.hyun.udong.travelschedule.presentation.controller;
 
-import com.hyun.udong.auth.oauth.TestOauth;
 import com.hyun.udong.common.fixture.TestFixture;
+import com.hyun.udong.common.fixture.TestOauth;
 import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;

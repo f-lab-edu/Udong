@@ -1,4 +1,4 @@
-package com.hyun.udong.auth.oauth;
+package com.hyun.udong.common.fixture;
 
 import com.hyun.udong.auth.util.JwtTokenProvider;
 import jakarta.annotation.PostConstruct;
