@@ -41,7 +41,7 @@ public class TravelScheduleService {
         List<TravelScheduleCity> travelScheduleCities = cities.stream()
                 .map(city -> new TravelScheduleCity(travelSchedule, city))
                 .toList();
-        travelSchedule.addTravelScheduleCities(travelScheduleCities);
+        travelSchedule.updateTravelScheduleCities(travelScheduleCities);
         travelScheduleRepository.save(travelSchedule);
 
         member.updateTravelSchedule(travelSchedule);
