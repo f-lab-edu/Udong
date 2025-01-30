@@ -85,7 +85,7 @@ public class AuthService {
         return member;
     }
 
-    public Member getMemberFromToken(String token) {
+    public Member findMemberFromToken(String token) {
         Long memberId = Long.parseLong(jwtTokenProvider.getSubjectFromToken(token));
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> InvalidTokenException.EXCEPTION);

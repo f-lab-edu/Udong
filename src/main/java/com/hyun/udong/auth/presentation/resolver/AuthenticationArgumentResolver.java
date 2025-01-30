@@ -39,7 +39,7 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
 
         isValidToken(token);
 
-        return authService.getMemberFromToken(token.substring(PREFIX.length()));
+        return authService.findMemberFromToken(token.substring(PREFIX.length()));
     }
 
     private void isValidToken(String token) {
