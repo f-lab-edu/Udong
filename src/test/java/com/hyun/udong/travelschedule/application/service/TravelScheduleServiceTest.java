@@ -1,6 +1,7 @@
 package com.hyun.udong.travelschedule.application.service;
 
 import com.hyun.udong.common.exception.NotFoundException;
+import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
@@ -8,6 +9,7 @@ import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
+@ExtendWith(DataCleanerExtension.class)
 @SpringBootTest
 class TravelScheduleServiceTest {
 

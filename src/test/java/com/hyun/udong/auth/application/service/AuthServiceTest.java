@@ -6,11 +6,13 @@ import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
 import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
 import com.hyun.udong.auth.presentation.dto.LoginResponse;
 import com.hyun.udong.auth.util.JwtTokenProvider;
+import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.mockito.BDDMockito.given;
 
+@ExtendWith(DataCleanerExtension.class)
 @SpringBootTest
 class AuthServiceTest {
 

@@ -1,31 +1,39 @@
 package com.hyun.udong.travelschedule.presentation.controller;
 
 import com.hyun.udong.auth.oauth.TestOauth;
+import com.hyun.udong.common.fixture.TestFixture;
+import com.hyun.udong.common.util.DataCleanerExtension;
+import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 
+@ExtendWith(DataCleanerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql("/member.sql")
 class TravelScheduleControllerTest {
 
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        memberRepository.save(TestFixture.HYUN);
     }
 
     @Test

@@ -14,6 +14,7 @@ public class TravelScheduleCity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "travel_schedule_city_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
