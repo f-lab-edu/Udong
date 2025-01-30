@@ -2,12 +2,12 @@ package com.hyun.udong.travelschedule.presentation.dto;
 
 import com.hyun.udong.common.annotation.DateFormat;
 import com.hyun.udong.travelschedule.domain.TravelSchedule;
+import com.hyun.udong.travelschedule.domain.TravelScheduleCity;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -26,6 +26,15 @@ public class TravelScheduleResponse {
     public static class TravelScheduleCityResponse {
         private Long cityId;
         private String cityName;
+        private String countryName;
+
+        public static TravelScheduleCityResponse from(TravelScheduleCity travelScheduleCity) {
+            return TravelScheduleCityResponse.builder()
+                    .cityId(travelScheduleCity.getCity().getId())
+                    .cityName(travelScheduleCity.getCity().getName())
+                    .countryName(travelScheduleCity.getCity().getCountry().getName())
+                    .build();
+        }
     }
 
     public static TravelScheduleResponse from(TravelSchedule travelSchedule) {
@@ -33,11 +42,8 @@ public class TravelScheduleResponse {
                 .startDate(travelSchedule.getStartDate())
                 .endDate(travelSchedule.getEndDate())
                 .travelScheduleCities(travelSchedule.getTravelScheduleCities().stream()
-                        .map(city -> TravelScheduleCityResponse.builder()
-                                .cityId(city.getCity().getId())
-                                .cityName(city.getCity().getName())
-                                .build())
-                        .collect(Collectors.toList()))
+                        .map(TravelScheduleCityResponse::from)
+                        .toList())
                 .build();
     }
 }
