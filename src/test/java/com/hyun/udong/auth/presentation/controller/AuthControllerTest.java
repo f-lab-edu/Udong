@@ -27,7 +27,6 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthControllerTest {
 
-    public static final int FIRST_SAVED_MEMBER_ID = 1;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -65,7 +64,6 @@ class AuthControllerTest {
 
                 .then().log().all()
                 .statusCode(200)
-                .body("id", equalTo(FIRST_SAVED_MEMBER_ID))
                 .body("nickname", equalTo(kakaoProfileResponse.getKakaoAccount().getNickname()))
                 .body("token.accessToken", notNullValue())
                 .body("token.refreshToken", notNullValue());

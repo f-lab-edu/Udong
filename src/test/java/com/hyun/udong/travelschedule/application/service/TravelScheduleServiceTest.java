@@ -1,9 +1,9 @@
 package com.hyun.udong.travelschedule.application.service;
 
 import com.hyun.udong.common.exception.NotFoundException;
+import com.hyun.udong.common.fixture.TestFixture;
 import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
-import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
@@ -24,7 +24,6 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 @SpringBootTest
 class TravelScheduleServiceTest {
 
-    public static final long FIRST_MEMBER_ID = 1L;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -32,10 +31,11 @@ class TravelScheduleServiceTest {
     @Autowired
     private TravelScheduleService travelScheduleService;
 
+    private Member savedMember;
+
     @BeforeEach
     void setUp() {
-        Member member = new Member(1L, SocialType.KAKAO, "hyun", "profile_image");
-        memberRepository.save(member);
+        savedMember = memberRepository.save(TestFixture.HYUN);
     }
 
     private TravelScheduleRequest createTravelScheduleRequest(Long... cityIds) {
@@ -48,7 +48,7 @@ class TravelScheduleServiceTest {
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
 
         // when
-        TravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request);
+        TravelSchedule travelSchedule = travelScheduleService.updateTravelSchedule(savedMember.getId(), request);
 
         // then
         then(travelSchedule).isNotNull();
@@ -72,13 +72,10 @@ class TravelScheduleServiceTest {
     @Test
     void 존재하지_않는_도시_ID로_여행_일정을_등록할_때_예외가_발생한다() {
         // given
-        Long memberId = 1L;
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 999L);
-        Member member = new Member(memberId, SocialType.KAKAO, "hyun", "profile_image");
-        memberRepository.save(member);
 
         // when & then
-        thenThrownBy(() -> travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request))
+        thenThrownBy(() -> travelScheduleService.updateTravelSchedule(savedMember.getId(), request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 도시가 존재하지 않습니다.");
     }
@@ -87,9 +84,9 @@ class TravelScheduleServiceTest {
     @Transactional
     void 유효한_회원_ID로_여행_일정을_조회한다() {
         // given
-        Long memberId = 1L;
+        Long memberId = savedMember.getId();
         TravelScheduleRequest request = createTravelScheduleRequest(1L, 2L);
-        travelScheduleService.updateTravelSchedule(FIRST_MEMBER_ID, request);
+        travelScheduleService.updateTravelSchedule(savedMember.getId(), request);
 
         // when
         Member member = memberRepository.findById(memberId)
@@ -116,12 +113,8 @@ class TravelScheduleServiceTest {
 
     @Test
     void 회원의_여행_일정이_없을_때_예외가_발생한다() {
-        // given
-        Member member = new Member(2L, SocialType.KAKAO, "dong", "profile_image");
-        memberRepository.save(member);
-
         // when & then
-        thenThrownBy(() -> travelScheduleService.findTravelSchedule(member.getId()))
+        thenThrownBy(() -> travelScheduleService.findTravelSchedule(savedMember.getId()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("여행 일정이 존재하지 않습니다.");
     }
