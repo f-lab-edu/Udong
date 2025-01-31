@@ -1,8 +1,9 @@
 package com.hyun.udong.travelschedule.presentation.controller;
 
-import com.hyun.udong.common.fixture.TestFixture;
 import com.hyun.udong.common.fixture.TestOauth;
 import com.hyun.udong.common.util.DataCleanerExtension;
+import com.hyun.udong.member.domain.Member;
+import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
 import io.restassured.RestAssured;
@@ -33,7 +34,7 @@ class TravelScheduleControllerTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        memberRepository.save(TestFixture.HYUN);
+        memberRepository.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
     }
 
     @Test

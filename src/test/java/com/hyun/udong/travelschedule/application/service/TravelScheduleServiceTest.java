@@ -1,9 +1,9 @@
 package com.hyun.udong.travelschedule.application.service;
 
 import com.hyun.udong.common.exception.NotFoundException;
-import com.hyun.udong.common.fixture.TestFixture;
 import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
+import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import com.hyun.udong.travelschedule.presentation.dto.TravelScheduleRequest;
@@ -24,7 +24,6 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 @SpringBootTest
 class TravelScheduleServiceTest {
 
-
     @Autowired
     private MemberRepository memberRepository;
 
@@ -35,7 +34,7 @@ class TravelScheduleServiceTest {
 
     @BeforeEach
     void setUp() {
-        savedMember = memberRepository.save(TestFixture.HYUN);
+        savedMember = memberRepository.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
     }
 
     private TravelScheduleRequest createTravelScheduleRequest(Long... cityIds) {
