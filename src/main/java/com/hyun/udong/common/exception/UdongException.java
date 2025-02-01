@@ -10,6 +10,11 @@ public class UdongException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    public UdongException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }

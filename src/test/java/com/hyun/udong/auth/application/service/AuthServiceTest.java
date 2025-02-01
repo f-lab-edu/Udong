@@ -6,11 +6,13 @@ import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
 import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
 import com.hyun.udong.auth.presentation.dto.LoginResponse;
 import com.hyun.udong.auth.util.JwtTokenProvider;
+import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.mockito.BDDMockito.given;
 
+@ExtendWith(DataCleanerExtension.class)
 @SpringBootTest
 class AuthServiceTest {
 
@@ -35,8 +38,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
-    @DisplayName("카카오 로그인 시 사용자 정보와 refresh_token이 저장된다.")
-    void kakaoLogin_save() {
+    void 카카오_로그인_시_사용자_정보와_refresh_token이_저장된다() {
         // given
         String code = "authCode";
         KakaoTokenResponse kakaoTokenResponse = new KakaoTokenResponse("accessToken");
@@ -59,8 +61,8 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("refreshToken 재발급 시 새로운 토큰을 저장한다.")
-    void refreshTokens_ok() {
+    @DisplayName(" 재발급 시 새로운 토큰을 저장한다.")
+    void refreshToken_재발급_시_새로운_토큰을_저장한다() {
         // given
         Member member = memberService.save(new Member(100L, SocialType.KAKAO, "hyun", "profile_image"));
         String initialRefreshToken = "initialRefreshToken";
@@ -80,9 +82,8 @@ class AuthServiceTest {
         then(updatedMember.getRefreshToken()).isEqualTo(newRefreshToken);
     }
 
-    @DisplayName("토큰 재발급 시 유효한 코드가 아니면 예외가 발생한다.")
     @Test
-    void refreshTokens_throw() {
+    void 토큰_재발급_시_유효한_코드가_아니면_예외가_발생한다() {
         String otherRefreshToken = jwtTokenProvider.generateRefreshToken(200L);
 
         // when & then

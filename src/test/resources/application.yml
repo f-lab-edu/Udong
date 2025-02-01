@@ -1,26 +1,31 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;
+    driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+    scripts: classpath:/data.sql
 
 social:
   kakao:
-    client-id: ${KAKAO_CLIENT_ID}
-    redirect-uri: ${KAKAO_REDIRECT_URI}
+    client-id: kakao-client-id
+    redirect-uri: kakao-redirect-uri
   google:
-    client-id: ${GOOGLE_CLIENT_ID}
-    client-secret: ${GOOGLE_CLIENT_SECRET}
-    redirect-uri: ${GOOGLE_REDIRECT_URI}
+    client-id: google-client-id
+    client-secret: google-client-secret
+    redirect-uri: google-redirect-uri
 
 jwt:
-  secret: ${JWT_SECRET}
-  access-token-expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}
-  refresh-token-expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
+  secret: udongudongudongudongudongudongudong123
+  access-token-expire-time: 123123
+  refresh-token-expire-time: 123123
 

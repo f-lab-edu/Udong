@@ -1,8 +1,8 @@
 package com.hyun.udong.member.application.service;
 
+import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
-import com.hyun.udong.member.exception.MemberNotFoundException;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class MemberService {
 
     public Member findById(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> MemberNotFoundException.EXCEPTION);
+                .orElseThrow(() -> new NotFoundException("해당 회원이 존재하지 않습니다."));
     }
 
 }

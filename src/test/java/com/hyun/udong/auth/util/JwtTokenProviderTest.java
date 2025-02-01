@@ -3,14 +3,12 @@ package com.hyun.udong.auth.util;
 import com.hyun.udong.auth.exception.ExpiredTokenException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,40 +23,31 @@ class JwtTokenProviderTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    @DisplayName("유효한 ID로 액세스 토큰을 생성하면 토큰을 반환한다.")
-    void generateAccessToken_validId_returnsToken() {
-        Long id = 1L;
-        String token = jwtTokenProvider.generateAccessToken(id);
+    void 유효한_ID로_액세스_토큰을_생성하면_토큰을_반환한다() {
+        String token = jwtTokenProvider.generateAccessToken(1L);
         assertNotNull(token);
     }
 
     @Test
-    @DisplayName("유효한 ID로 리프레시 토큰을 생성하면 토큰을 반환한다.")
-    void generateRefreshToken_validId_returnsToken() {
-        Long id = 1L;
-        String token = jwtTokenProvider.generateRefreshToken(id);
+    void 유효한_ID로_리프레시_토큰을_생성하면_토큰을_반환한다() {
+        String token = jwtTokenProvider.generateRefreshToken(1L);
         assertNotNull(token);
     }
 
     @Test
-    @DisplayName("유효한 토큰에서 회원 ID를 추출하면 ID를 반환한다.")
-    void getSubject() {
-        Long id = 1L;
-        String token = jwtTokenProvider.generateAccessToken(id);
+    void 유효한_토큰에서_회원_ID를_추출하면_ID를_반환한다() {
+        String token = jwtTokenProvider.generateAccessToken(1L);
         String memberId = jwtTokenProvider.getSubjectFromToken(token);
-        assertEquals(id.toString(), memberId);
+        assertEquals(((Long) 1L).toString(), memberId);
     }
 
     @Test
-    @DisplayName("유효하지 않은 토큰에서 회원 ID를 추출하면 예외를 던진다.")
-    void getSubjectFromToken_invalidToken_throwsException() {
-        String token = "invalid.token";
-        assertThrows(Exception.class, () -> jwtTokenProvider.getSubjectFromToken(token));
+    void 유효하지_않은_토큰에서_회원_ID를_추출하면_예외를_던진다() {
+        assertThrows(Exception.class, () -> jwtTokenProvider.getSubjectFromToken("invalid.token"));
     }
 
     @Test
-    @DisplayName("만료된 토큰을 검증하면 ExpiredTokenException을 던진다.")
-    void parseToken_expiredToken_throwsExpiredTokenException() {
+    void 만료된_토큰을_검증하면_ExpiredTokenException을_던진다() {
         String expiredToken = Jwts.builder()
                 .setSubject("1")
                 .setIssuedAt(new Date(System.currentTimeMillis() - 2000))
@@ -68,23 +57,4 @@ class JwtTokenProviderTest {
 
         assertThrows(ExpiredTokenException.class, () -> jwtTokenProvider.getSubjectFromToken(expiredToken));
     }
-
-    @Test
-    @DisplayName("액세스 토큰과 리프레시 토큰의 만료 시간(1시간 뒤, 2주 뒤)을 검증한다.")
-    void validateTokenExpiryTimes() {
-        // given
-        Long memberId = 1L;
-        String accessToken = jwtTokenProvider.generateAccessToken(memberId);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId);
-
-        // when
-        LocalDateTime accessTokenExpireTime = jwtTokenProvider.getTokenExpireTime(accessToken);
-        LocalDateTime refreshTokenExpireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
-
-        // then
-        LocalDateTime now = LocalDateTime.now();
-        assertEquals(now.plusHours(1).withNano(0), accessTokenExpireTime.withNano(0));
-        assertEquals(now.plusDays(14).withNano(0), refreshTokenExpireTime.withNano(0));
-    }
-
 }

@@ -10,12 +10,16 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+    defer-datasource-initialization: true # Hibernate 초기화 후 데이터 삽입 실행
   application:
     name: udong
   mvc:
     view:
       prefix: /templates/
       suffix: .html
+  sql:
+    init:
+      mode: always
 
 social:
   kakao:

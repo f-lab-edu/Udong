@@ -1,5 +1,7 @@
 package com.hyun.udong.member.domain;
 
+import com.hyun.udong.common.entity.BaseTimeEntity;
+import com.hyun.udong.travelschedule.domain.TravelSchedule;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +11,11 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
     private Long socialId;
@@ -30,15 +33,10 @@ public class Member {
 
     private String refreshToken;
 
-    public Member(Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
-        this.socialId = socialId;
-        this.socialType = socialType;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-    }
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private TravelSchedule travelSchedule;
 
-    public Member(Long id, Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
-        this.id = id;
+    public Member(Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
         this.socialId = socialId;
         this.socialType = socialType;
         this.nickname = nickname;
@@ -47,5 +45,9 @@ public class Member {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateTravelSchedule(TravelSchedule travelSchedule) {
+        this.travelSchedule = travelSchedule;
     }
 }

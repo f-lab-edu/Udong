@@ -23,10 +23,10 @@ import static io.jsonwebtoken.Jwts.parserBuilder;
 @Slf4j
 public class JwtTokenProvider {
 
-    @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
+    @Value("${jwt.access-token-expire-time}")
     private long accessTokenExpireTime;
 
-    @Value("${REFRESH_TOKEN_EXPIRE_TIME}")
+    @Value("${jwt.refresh-token-expire-time}")
     private long refreshTokenExpireTime;
 
     @Value("${jwt.secret}")
