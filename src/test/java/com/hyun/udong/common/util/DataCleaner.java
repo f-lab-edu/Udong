@@ -12,8 +12,14 @@ import java.util.List;
 @Component
 public class DataCleaner {
 
-    private static final String FIND_TABLES_QUERY = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'PUBLIC' AND table_name NOT IN ('CITY', 'COUNTRY')";
-
+    private static final String[] EXCLUDED_TABLES = {"CITY", "COUNTRY",
+            "UDONG_TAGS", "UDONG_WAITING_MEMBER", "UDONG_MEMBER"};
+    private static final String FIND_TABLES_QUERY = """
+                SELECT table_name 
+                FROM information_schema.tables 
+                WHERE table_schema = 'PUBLIC' 
+                AND table_name NOT IN (%s)
+            """.formatted(String.join(", ", wrapWithQuotes(EXCLUDED_TABLES)));
     private final List<String> tableNames = new ArrayList<>();
 
     @PersistenceContext
@@ -45,5 +51,13 @@ public class DataCleaner {
 
     private String getIdColumnName(String tableName) {
         return tableName.toUpperCase() + "_ID";
+    }
+
+    private static String[] wrapWithQuotes(String[] tables) {
+        String[] wrappedTables = new String[tables.length];
+        for (int i = 0; i < tables.length; i++) {
+            wrappedTables[i] = "'" + tables[i] + "'";
+        }
+        return wrappedTables;
     }
 }
