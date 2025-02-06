@@ -24,6 +24,7 @@ public class UdongService {
     private final CityRepository cityRepository;
     private final UdongRepository udongRepository;
 
+    @Transactional
     public UdongResponse createUdong(CreateUdongRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("해당 회원이 존재하지 않습니다."));
