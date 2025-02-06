@@ -82,7 +82,7 @@ public class Udong extends BaseTimeEntity {
         cities.forEach(this::addCity);
     }
 
-    public void addCity(City city) {
+    private void addCity(City city) {
         boolean isDuplicate = travelCities.stream()
                 .anyMatch(travelCity -> travelCity.getCity().getId().equals(city.getId()));
 
