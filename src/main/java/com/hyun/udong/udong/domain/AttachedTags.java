@@ -27,7 +27,7 @@ public class AttachedTags {
             throw new InvalidInputException("태그는 비어있을 수 없습니다.");
         }
 
-        if (tags.size() > 10) {
+        if (tags.size() > 5) {
             throw new InvalidInputException("태그는 5개 이하로 설정해야 합니다.");
         }
     }

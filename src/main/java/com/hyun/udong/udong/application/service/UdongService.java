@@ -33,7 +33,7 @@ public class UdongService {
         Udong udong = Udong.builder()
                 .content(Content.of(request.getTitle(), request.getDescription()))
                 .participants(Participants.from(loginMember.getId()))
-                .recruitPlanner(RecruitPlanner.of(request.getRecruitmentCount()))
+                .recruitPlanner(RecruitPlanner.from(request.getRecruitmentCount()))
                 .travelPlanner(TravelPlanner.of(request.getStartDate(), request.getEndDate()))
                 .attachedTags(AttachedTags.of(request.getTags()))
                 .build();

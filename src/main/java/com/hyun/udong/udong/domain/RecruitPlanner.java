@@ -27,7 +27,7 @@ public class RecruitPlanner {
         this.recruitmentCount = recruitmentCount;
     }
 
-    public static RecruitPlanner of(int recruitmentCount) {
+    public static RecruitPlanner from(int recruitmentCount) {
         return new RecruitPlanner(recruitmentCount);
     }
 
