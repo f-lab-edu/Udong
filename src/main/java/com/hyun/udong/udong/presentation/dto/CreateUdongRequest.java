@@ -1,12 +1,16 @@
 package com.hyun.udong.udong.presentation.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateUdongRequest {
 
     @NotEmpty(message = "도시를 1개 이상 선택해주세요.")
