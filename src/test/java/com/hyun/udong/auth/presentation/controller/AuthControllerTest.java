@@ -60,7 +60,7 @@ class AuthControllerTest {
                 .param("code", "authCode")
 
                 .when()
-                .get("/auth/oauth/kakao")
+                .get("/api/auth/oauth/kakao")
 
                 .then().log().all()
                 .statusCode(200)
@@ -85,7 +85,7 @@ class AuthControllerTest {
                 .param("refreshToken", refreshToken)
 
                 .when()
-                .get("/auth/token/refresh")
+                .get("/api/auth/token/refresh")
 
                 .then().log().all()
                 .statusCode(200)

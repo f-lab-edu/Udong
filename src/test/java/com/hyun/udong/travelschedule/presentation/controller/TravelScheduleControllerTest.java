@@ -51,7 +51,7 @@ class TravelScheduleControllerTest {
                 .body(request)
 
                 .when()
-                .post("/travel/schedule")
+                .post("/api/travel/schedule")
 
                 .then().log().all()
                 .statusCode(200)
@@ -69,7 +69,7 @@ class TravelScheduleControllerTest {
                 .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
 
                 .when()
-                .post("/travel/schedule")
+                .post("/api/travel/schedule")
 
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
