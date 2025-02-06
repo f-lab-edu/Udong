@@ -34,6 +34,7 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_schedule_id")
     private TravelSchedule travelSchedule;
 
     public Member(Long socialId, SocialType socialType, String nickname, String profileImageUrl) {
