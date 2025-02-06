@@ -55,7 +55,7 @@ public class Udong extends BaseTimeEntity {
                  RecruitPlanner recruitPlanner,
                  TravelPlanner travelPlanner,
                  AttachedTags attachedTags) {
-        this(content, participants, recruitPlanner, travelPlanner, attachedTags, new WaitingMembers(), UdongStatus.PREPARE);
+        this(content, participants, recruitPlanner, travelPlanner, attachedTags, WaitingMembers.empty(), UdongStatus.PREPARE);
     }
 
     private Udong(Content content,
@@ -92,6 +92,7 @@ public class Udong extends BaseTimeEntity {
         }
     }
 
+    @Override
     public LocalDateTime getCreatedAt() {
         return super.getCreatedAt();
     }
