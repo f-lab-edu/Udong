@@ -22,6 +22,6 @@ public class UdongController {
     @PostMapping
     public ResponseEntity<UdongResponse> createUdong(@Valid @RequestBody CreateUdongRequest request,
                                                      @LoginMember Member member) {
-        return ResponseEntity.ok(udongService.createUdong(request, member));
+        return ResponseEntity.ok(udongService.createUdong(request, member.getId()));
     }
 }
