@@ -4,9 +4,12 @@ import com.hyun.udong.common.entity.BaseTimeEntity;
 import com.hyun.udong.travelschedule.domain.City;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,16 +49,50 @@ public class Udong extends BaseTimeEntity {
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
 
+    @Builder
+    public Udong(Content content,
+                 Participants participants,
+                 RecruitPlanner recruitPlanner,
+                 TravelPlanner travelPlanner,
+                 AttachedTags attachedTags) {
+        this(content, participants, recruitPlanner, travelPlanner, attachedTags, new WaitingMembers(), UdongStatus.PREPARE);
+    }
+
+    private Udong(Content content,
+                  Participants participants,
+                  RecruitPlanner recruitPlanner,
+                  TravelPlanner travelPlanner,
+                  AttachedTags attachedTags,
+                  WaitingMembers waitingMembers,
+                  UdongStatus status) {
+        this.content = content;
+        this.participants = participants;
+        this.recruitPlanner = recruitPlanner;
+        this.travelPlanner = travelPlanner;
+        this.attachedTags = attachedTags;
+        this.waitingMembers = waitingMembers;
+        if (travelPlanner.getStartDate().isEqual(LocalDate.now())) {
+            this.status = UdongStatus.IN_PROGRESS;
+        } else {
+            this.status = status;
+        }
+    }
+
     public void addCities(List<City> cities) {
         cities.forEach(this::addCity);
     }
 
     public void addCity(City city) {
-        boolean isDuplicate = travelCities.stream().anyMatch(travelCity -> travelCity.getCity().getId().equals(city.getId()));
+        boolean isDuplicate = travelCities.stream()
+                .anyMatch(travelCity -> travelCity.getCity().getId().equals(city.getId()));
+
         if (!isDuplicate) {
             TravelCity travelCity = new TravelCity(this, city);
             travelCities.add(travelCity);
         }
     }
 
+    public LocalDateTime getCreatedAt() {
+        return super.getCreatedAt();
+    }
 }

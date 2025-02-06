@@ -5,8 +5,6 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 import static lombok.AccessLevel.PROTECTED;
 
 @Getter
@@ -17,6 +15,12 @@ public class RecruitPlanner {
     @Column(name = "recruitment_count")
     private int recruitmentCount;
 
-    private LocalDate recruitmentEndDate;
+    private RecruitPlanner(int recruitmentCount) {
+        this.recruitmentCount = recruitmentCount;
+    }
+
+    public static RecruitPlanner of(int recruitmentCount) {
+        return new RecruitPlanner(recruitmentCount);
+    }
 
 }

@@ -4,10 +4,10 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -21,8 +21,11 @@ public class AttachedTags {
     @CollectionTable(name = "udong_tags", joinColumns = @JoinColumn(name = "udong_id"))
     private Set<String> tags;
 
-    @Builder
     public AttachedTags(Set<String> tags) {
         this.tags = tags;
+    }
+
+    public static AttachedTags of(List<String> tags) {
+        return new AttachedTags(Set.copyOf(tags));
     }
 }

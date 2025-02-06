@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -22,5 +21,17 @@ public class Participants {
 
     @ElementCollection
     @CollectionTable(name = "udong_member", joinColumns = @JoinColumn(name = "udong_id"))
-    private Set<Participant> participants = new HashSet<>();
+    private Set<Participant> participants;
+
+    private Participants(Long ownerId, Set<Participant> participants) {
+        this.ownerId = ownerId;
+        this.participants = participants;
+        this.size = participants.size();
+    }
+
+    public static Participants from(Long ownerId) {
+        Set<Participant> participants = Set.of(new Participant(ownerId));
+        return new Participants(ownerId, participants);
+    }
+
 }

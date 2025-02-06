@@ -20,4 +20,8 @@ public abstract class BaseTimeEntity {
     @Column
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    protected LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
 }

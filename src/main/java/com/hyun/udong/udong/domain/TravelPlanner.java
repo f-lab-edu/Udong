@@ -19,4 +19,14 @@ public class TravelPlanner {
 
     @Column(nullable = false)
     private LocalDate endDate;
+
+    private TravelPlanner(LocalDate startDate, LocalDate endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public static TravelPlanner of(LocalDate startDate, LocalDate endDate) {
+        return new TravelPlanner(startDate, endDate);
+    }
+
 }
