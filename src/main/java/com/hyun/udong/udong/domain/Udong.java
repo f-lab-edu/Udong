@@ -44,17 +44,17 @@ public class Udong extends BaseTimeEntity {
     private UdongStatus status;
 
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UdongCity> travelCities = new ArrayList<>();
+    private List<TravelCity> travelCities = new ArrayList<>();
 
     public void addCities(List<City> cities) {
         cities.forEach(this::addCity);
     }
 
     public void addCity(City city) {
-        boolean isDuplicate = travelCities.stream().anyMatch(udongCity -> udongCity.getCity().getId().equals(city.getId()));
+        boolean isDuplicate = travelCities.stream().anyMatch(travelCity -> travelCity.getCity().getId().equals(city.getId()));
         if (!isDuplicate) {
-            UdongCity udongCity = new UdongCity(this, city);
-            travelCities.add(udongCity);
+            TravelCity travelCity = new TravelCity(this, city);
+            travelCities.add(travelCity);
         }
     }
 

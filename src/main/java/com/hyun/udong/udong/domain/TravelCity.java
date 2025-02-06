@@ -11,7 +11,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class UdongCity {
+public class TravelCity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -25,7 +25,7 @@ public class UdongCity {
     @JoinColumn(name = "city_id")
     private City city;
 
-    public UdongCity(Udong udong, City city) {
+    public TravelCity(Udong udong, City city) {
         this.udong = udong;
         this.city = city;
     }
