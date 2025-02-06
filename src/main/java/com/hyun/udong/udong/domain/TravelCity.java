@@ -15,6 +15,7 @@ public class TravelCity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "travel_city_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
