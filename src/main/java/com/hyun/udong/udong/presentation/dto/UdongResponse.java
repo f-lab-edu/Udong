@@ -59,7 +59,7 @@ public class UdongResponse {
                 udong.getId(),
                 udong.getContent().getTitle(),
                 udong.getContent().getDescription(),
-                udong.getParticipants().getSize(),
+                udong.getParticipants().getCurrentParticipantsSize(),
                 udong.getAttachedTags().getTags(),
                 udong.getStatus().name(),
                 udong.getParticipants().getOwnerId(),

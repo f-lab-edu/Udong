@@ -13,6 +13,6 @@ class ParticipantsTest {
 
         assertThat(participants.getOwnerId()).isEqualTo(ownerId);
         assertThat(participants.getParticipants()).hasSize(1);
-        assertThat(participants.getSize()).isEqualTo(1);
+        assertThat(participants.getCurrentParticipantsSize()).isEqualTo(1);
     }
 }

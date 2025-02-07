@@ -13,8 +13,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class Participants {
 
-    @Column(name = "current_member_count")
-    private int size;
+    private int currentParticipantsSize;
 
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
@@ -26,7 +25,7 @@ public class Participants {
     private Participants(Long ownerId, Set<Participant> participants) {
         this.ownerId = ownerId;
         this.participants = participants;
-        this.size = participants.size();
+        this.currentParticipantsSize = participants.size();
     }
 
     public static Participants from(Long ownerId) {
