@@ -22,7 +22,7 @@ public class UdongResponse {
     private final Set<String> tags;
     private final String status;
     private final Long ownerId;
-    private final UdongParticipantsResponse participants;
+    private final List<ParticipantResponse> participants;
     @DateFormat
     private final LocalDate startDate;
     @DateFormat
@@ -37,7 +37,7 @@ public class UdongResponse {
                          Set<String> tags,
                          String status,
                          Long ownerId,
-                         UdongParticipantsResponse participants,
+                         List<ParticipantResponse> participants,
                          LocalDate startDate,
                          LocalDate endDate,
                          LocalDateTime createdAt) {
@@ -59,11 +59,11 @@ public class UdongResponse {
                 udong.getId(),
                 udong.getContent().getTitle(),
                 udong.getContent().getDescription(),
-                udong.getParticipants().getCurrentParticipantsSize(),
+                udong.getCurrentParticipantsSize(),
                 udong.getAttachedTags().getTags(),
                 udong.getStatus().name(),
-                udong.getParticipants().getOwnerId(),
-                UdongParticipantsResponse.from(participants),
+                udong.getOwnerId(),
+                participants.stream().map(ParticipantResponse::of).toList(),
                 udong.getTravelPlanner().getStartDate(),
                 udong.getTravelPlanner().getEndDate(),
                 udong.getCreatedAt()

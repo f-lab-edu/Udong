@@ -26,9 +26,6 @@ public class UdongService {
 
     @Transactional
     public UdongResponse createUdong(CreateUdongRequest request, Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("해당 회원이 존재하지 않습니다."));
-
         List<City> cities = cityRepository.findAllById(request.getCityIds());
         if (cities.size() != request.getCityIds().size()) {
             throw new NotFoundException("해당 도시가 존재하지 않습니다.");
@@ -36,10 +33,10 @@ public class UdongService {
 
         Udong udong = Udong.builder()
                 .content(Content.of(request.getTitle(), request.getDescription()))
-                .participants(Participants.from(member.getId()))
                 .recruitPlanner(RecruitPlanner.from(request.getRecruitmentCount()))
                 .travelPlanner(TravelPlanner.of(request.getStartDate(), request.getEndDate()))
                 .attachedTags(AttachedTags.of(request.getTags()))
+                .ownerId(memberId)
                 .build();
 
         udong.addCities(cities);
@@ -47,7 +44,7 @@ public class UdongService {
         Udong savedUdong = udongRepository.save(udong);
 
         List<Member> participants = memberRepository.findAllById(
-                savedUdong.getParticipants().getParticipants().stream()
+                savedUdong.getParticipants().stream()
                         .map(Participant::getMemberId)
                         .toList());
         return UdongResponse.from(udong, participants);

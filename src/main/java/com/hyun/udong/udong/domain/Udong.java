@@ -1,6 +1,7 @@
 package com.hyun.udong.udong.domain;
 
 import com.hyun.udong.common.entity.BaseTimeEntity;
+import com.hyun.udong.common.exception.InvalidParameterException;
 import com.hyun.udong.travelschedule.domain.City;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,11 +24,11 @@ public class Udong extends BaseTimeEntity {
     @Column(name = "udong_id")
     private Long id;
 
-    @Embedded
-    private Content content;
+    @Column(nullable = false)
+    private Long ownerId;
 
     @Embedded
-    private Participants participants;
+    private Content content;
 
     @Embedded
     private RecruitPlanner recruitPlanner;
@@ -38,9 +39,6 @@ public class Udong extends BaseTimeEntity {
     @Embedded
     private AttachedTags attachedTags;
 
-    @Embedded
-    private WaitingMembers waitingMembers;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UdongStatus status;
@@ -48,33 +46,32 @@ public class Udong extends BaseTimeEntity {
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
 
+    @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Participant> participants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WaitingMember> waitingMembers = new ArrayList<>();
+
     @Builder
     public Udong(Content content,
-                 Participants participants,
                  RecruitPlanner recruitPlanner,
                  TravelPlanner travelPlanner,
-                 AttachedTags attachedTags) {
-        this(content, participants, recruitPlanner, travelPlanner, attachedTags, WaitingMembers.empty(), UdongStatus.PREPARE);
-    }
-
-    private Udong(Content content,
-                  Participants participants,
-                  RecruitPlanner recruitPlanner,
-                  TravelPlanner travelPlanner,
-                  AttachedTags attachedTags,
-                  WaitingMembers waitingMembers,
-                  UdongStatus status) {
+                 AttachedTags attachedTags,
+                 Long ownerId) {
+        if (ownerId == null) {
+            throw new InvalidParameterException("ownerId는 필수값입니다.");
+        }
+        this.ownerId = ownerId;
         this.content = content;
-        this.participants = participants;
         this.recruitPlanner = recruitPlanner;
         this.travelPlanner = travelPlanner;
         this.attachedTags = attachedTags;
-        this.waitingMembers = waitingMembers;
         if (travelPlanner.getStartDate().isEqual(LocalDate.now())) {
             this.status = UdongStatus.IN_PROGRESS;
         } else {
-            this.status = status;
+            this.status = UdongStatus.PREPARE;
         }
+        addParticipant(ownerId);
     }
 
     public void addCities(List<City> cities) {
@@ -89,5 +86,14 @@ public class Udong extends BaseTimeEntity {
             TravelCity travelCity = new TravelCity(this, city);
             travelCities.add(travelCity);
         }
+    }
+
+    public void addParticipant(Long memberId) {
+        Participant participant = Participant.from(memberId, this);
+        participants.add(participant);
+    }
+
+    public int getCurrentParticipantsSize() {
+        return participants.size();
     }
 }
