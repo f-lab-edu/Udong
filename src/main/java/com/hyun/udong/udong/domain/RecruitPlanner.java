@@ -1,7 +1,6 @@
 package com.hyun.udong.udong.domain;
 
 import com.hyun.udong.common.exception.InvalidParameterException;
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,6 @@ public class RecruitPlanner {
     public static final int MIN_RECRUIT_COUNT = 2;
     public static final int MAX_RECRUIT_COUNT = 10;
 
-    @Column(name = "recruitment_count")
     private int recruitmentCount;
 
     private void validate(int recruitmentCount) {
