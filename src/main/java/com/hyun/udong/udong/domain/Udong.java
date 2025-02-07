@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,10 +89,5 @@ public class Udong extends BaseTimeEntity {
             TravelCity travelCity = new TravelCity(this, city);
             travelCities.add(travelCity);
         }
-    }
-
-    @Override
-    public LocalDateTime getCreatedAt() {
-        return super.getCreatedAt();
     }
 }
