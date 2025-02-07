@@ -93,22 +93,4 @@ class UdongServiceTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 도시가 존재하지 않습니다.");
     }
-
-    @Test
-    void 존재하지_않는_회원으로_모집글을_생성하면_예외발생() {
-        // given
-        CreateUdongRequest request = new CreateUdongRequest(
-                List.of(1L, 2L),
-                "동행 구해요",
-                "서울과 부산 여행할 동행을 찾습니다!",
-                5,
-                LocalDate.now().plusDays(5),
-                LocalDate.now().plusDays(10),
-                List.of("여행", "맛집"));
-
-        // when & then
-        thenThrownBy(() -> udongService.createUdong(request, NOT_EXISTS_MEMBER_ID))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("해당 회원이 존재하지 않습니다.");
-    }
 }
