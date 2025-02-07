@@ -1,6 +1,6 @@
 package com.hyun.udong.udong.domain;
 
-import com.hyun.udong.common.exception.InvalidInputException;
+import com.hyun.udong.common.exception.InvalidParameterException;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
@@ -24,11 +24,11 @@ public class AttachedTags {
 
     private void validate(Set<String> tags) {
         if (tags == null || tags.isEmpty()) {
-            throw new InvalidInputException("태그는 비어있을 수 없습니다.");
+            throw new InvalidParameterException("태그는 비어있을 수 없습니다.");
         }
 
         if (tags.size() > 5) {
-            throw new InvalidInputException("태그는 5개 이하로 설정해야 합니다.");
+            throw new InvalidParameterException("태그는 5개 이하로 설정해야 합니다.");
         }
     }
 

@@ -1,6 +1,6 @@
 package com.hyun.udong.udong.domain;
 
-import com.hyun.udong.common.exception.InvalidInputException;
+import com.hyun.udong.common.exception.InvalidParameterException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -21,10 +21,10 @@ public class Content {
 
     private void validate(String title, String description) {
         if (title == null || title.isBlank() || title.length() > 100) {
-            throw new InvalidInputException("제목은 1~100자 사이여야 합니다.");
+            throw new InvalidParameterException("제목은 1~100자 사이여야 합니다.");
         }
         if (description == null || description.isBlank() || description.length() > 1000) {
-            throw new InvalidInputException("내용은 1~1000자 사이여야 합니다.");
+            throw new InvalidParameterException("내용은 1~1000자 사이여야 합니다.");
         }
     }
 

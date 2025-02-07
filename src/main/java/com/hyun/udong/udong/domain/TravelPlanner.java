@@ -1,6 +1,6 @@
 package com.hyun.udong.udong.domain;
 
-import com.hyun.udong.common.exception.InvalidPeriodException;
+import com.hyun.udong.common.exception.InvalidParameterException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -23,15 +23,15 @@ public class TravelPlanner {
 
     private void validate(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
-            throw new InvalidPeriodException("여행 시작일과 종료일을 모두 입력해야 합니다.");
+            throw new InvalidParameterException("여행 시작일과 종료일을 모두 입력해야 합니다.");
         }
 
         if (startDate.isBefore(LocalDate.now())) {
-            throw new InvalidPeriodException("여행 시작일은 오늘 이후여야 합니다.");
+            throw new InvalidParameterException("여행 시작일은 오늘 이후여야 합니다.");
         }
 
         if (endDate.isBefore(startDate)) {
-            throw new InvalidPeriodException("여행 종료일은 시작일 이후여야 합니다.");
+            throw new InvalidParameterException("여행 종료일은 시작일 이후여야 합니다.");
         }
     }
 

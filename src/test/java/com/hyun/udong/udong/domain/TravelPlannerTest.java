@@ -1,6 +1,6 @@
 package com.hyun.udong.udong.domain;
 
-import com.hyun.udong.common.exception.InvalidPeriodException;
+import com.hyun.udong.common.exception.InvalidParameterException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -13,7 +13,7 @@ class TravelPlannerTest {
     @Test
     void 시작일과_종료일이_null이면_예외발생한다() {
         assertThatThrownBy(() -> TravelPlanner.of(null, null))
-                .isInstanceOf(InvalidPeriodException.class)
+                .isInstanceOf(InvalidParameterException.class)
                 .hasMessage("여행 시작일과 종료일을 모두 입력해야 합니다.");
     }
 
@@ -23,7 +23,7 @@ class TravelPlannerTest {
         LocalDate pastDate = LocalDate.now().minusDays(1);
 
         assertThatThrownBy(() -> TravelPlanner.of(pastDate, LocalDate.now().plusDays(5)))
-                .isInstanceOf(InvalidPeriodException.class)
+                .isInstanceOf(InvalidParameterException.class)
                 .hasMessage("여행 시작일은 오늘 이후여야 합니다.");
     }
 
@@ -33,7 +33,7 @@ class TravelPlannerTest {
         LocalDate endDate = LocalDate.now().plusDays(2);
 
         assertThatThrownBy(() -> TravelPlanner.of(startDate, endDate))
-                .isInstanceOf(InvalidPeriodException.class)
+                .isInstanceOf(InvalidParameterException.class)
                 .hasMessage("여행 종료일은 시작일 이후여야 합니다.");
     }
 
