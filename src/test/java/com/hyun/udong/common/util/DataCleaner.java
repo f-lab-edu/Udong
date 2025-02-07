@@ -13,7 +13,7 @@ import java.util.List;
 public class DataCleaner {
 
     private static final String[] EXCLUDED_TABLES = {"CITY", "COUNTRY",
-            "UDONG_TAGS", "UDONG_WAITING_MEMBER", "UDONG_MEMBER"};
+            "UDONG_TAGS"};
     private static final String FIND_TABLES_QUERY = """
                 SELECT table_name 
                 FROM information_schema.tables 
