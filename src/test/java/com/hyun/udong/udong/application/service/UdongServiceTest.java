@@ -67,9 +67,9 @@ class UdongServiceTest {
         then(response.getEndDate()).isEqualTo(request.getEndDate());
         then(response.getTags()).isEqualTo(Set.copyOf(request.getTags()));
         then(response.getCurrentMemberCount()).isEqualTo(1);
-        then(response.getParticipants().participants()).hasSize(1);
-        then(response.getParticipants().participants().get(0).id()).isEqualTo(member.getId());
-        then(response.getParticipants().participants().get(0).name()).isEqualTo(member.getNickname());
+        then(response.getParticipants()).hasSize(1);
+        then(response.getParticipants().get(0).id()).isEqualTo(member.getId());
+        then(response.getParticipants().get(0).name()).isEqualTo(member.getNickname());
         then(savedUdong.getTravelCities().size()).isEqualTo(2);
         then(savedUdong.getTravelCities().get(0).getId()).isEqualTo(CITY_ID_OF_SEOUL);
         then(savedUdong.getTravelCities().get(1).getId()).isEqualTo(CITY_ID_OF_BUSAN);

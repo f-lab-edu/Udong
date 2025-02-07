@@ -68,7 +68,7 @@ class UdongControllerTest {
                 .body("description", equalTo(request.getDescription()))
                 .body("startDate", equalTo(String.valueOf(request.getStartDate())))
                 .body("endDate", equalTo(String.valueOf(request.getEndDate())))
-                .body("participants.currentMemberCount", equalTo(1))
+                .body("currentMemberCount", equalTo(1))
                 .body("tags", containsInAnyOrder("여행", "맛집"));
     }
 
