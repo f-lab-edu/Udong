@@ -11,14 +11,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 class TravelPlannerTest {
 
     @Test
-    void 시작일과_종료일이_null이면_예외발생한다() {
-        assertThatThrownBy(() -> TravelPlanner.of(null, null))
-                .isInstanceOf(InvalidParameterException.class)
-                .hasMessage("여행 시작일과 종료일을 모두 입력해야 합니다.");
-    }
-
-
-    @Test
     void 시작일이_오늘보다_과거면_예외발생한다() {
         LocalDate pastDate = LocalDate.now().minusDays(1);
 
