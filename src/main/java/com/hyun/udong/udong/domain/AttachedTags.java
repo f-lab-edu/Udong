@@ -18,16 +18,14 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class AttachedTags {
 
+    public static final int MAX_TAGS_SIZE = 5;
+
     @ElementCollection
     @CollectionTable(name = "udong_tags", joinColumns = @JoinColumn(name = "udong_id"))
     private Set<String> tags;
 
     private void validate(Set<String> tags) {
-        if (tags == null || tags.isEmpty()) {
-            throw new InvalidParameterException("태그는 비어있을 수 없습니다.");
-        }
-
-        if (tags.size() > 5) {
+        if (tags.size() > MAX_TAGS_SIZE) {
             throw new InvalidParameterException("태그는 5개 이하로 설정해야 합니다.");
         }
     }

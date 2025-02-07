@@ -22,10 +22,6 @@ public class TravelPlanner {
     private LocalDate endDate;
 
     private void validate(LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            throw new InvalidParameterException("여행 시작일과 종료일을 모두 입력해야 합니다.");
-        }
-
         if (startDate.isBefore(LocalDate.now())) {
             throw new InvalidParameterException("여행 시작일은 오늘 이후여야 합니다.");
         }

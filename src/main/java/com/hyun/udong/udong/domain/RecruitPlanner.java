@@ -13,11 +13,14 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class RecruitPlanner {
 
+    public static final int MIN_RECRUIT_COUNT = 2;
+    public static final int MAX_RECRUIT_COUNT = 10;
+
     @Column(name = "recruitment_count")
     private int recruitmentCount;
 
     private void validate(int recruitmentCount) {
-        if (recruitmentCount < 2 || recruitmentCount > 10) {
+        if (recruitmentCount < MIN_RECRUIT_COUNT || recruitmentCount > MAX_RECRUIT_COUNT) {
             throw new InvalidParameterException("모집 인원은 2명 이상 10명 이하로 설정해야 합니다.");
         }
     }
