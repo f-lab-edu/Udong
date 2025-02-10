@@ -13,6 +13,8 @@ public class TestOauth {
 
     public static String ACCESS_TOKEN_1L;
 
+    public static String ACCESS_TOKEN_NOT_EXIST = "Bearer " + "not_exist_token";
+
     @PostConstruct
     public void init() {
         ACCESS_TOKEN_1L = "Bearer " + jwtTokenProvider.generateAccessToken(1L);

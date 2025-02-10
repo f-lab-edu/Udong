@@ -5,7 +5,6 @@ import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
-import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.udong.presentation.dto.CreateUdongRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -31,9 +30,6 @@ class UdongControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private CityRepository cityRepository;
 
     @BeforeEach
     void setUp() {
@@ -68,7 +64,7 @@ class UdongControllerTest {
                 .body("description", equalTo(request.getDescription()))
                 .body("startDate", equalTo(String.valueOf(request.getStartDate())))
                 .body("endDate", equalTo(String.valueOf(request.getEndDate())))
-                .body("currentMemberCount", equalTo(1))
+                .body("currentParticipantsCount", equalTo(1))
                 .body("tags", containsInAnyOrder("여행", "맛집"));
     }
 
@@ -84,5 +80,29 @@ class UdongControllerTest {
 
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void 유효하지_않은_토큰으로_모집글_생성시_UNAUTHORIZED_반환한다() {
+        CreateUdongRequest request = new CreateUdongRequest(
+                List.of(1L, 2L),
+                "동행 구해요",
+                "서울과 부산 여행할 동행을 찾습니다!",
+                5,
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(10),
+                List.of("여행", "맛집"));
+
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_NOT_EXIST)
+                .body(request)
+
+                .when()
+                .post("/api/udongs")
+
+                .then().log().all()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 }
