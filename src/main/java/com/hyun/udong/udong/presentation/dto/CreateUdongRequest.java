@@ -17,11 +17,11 @@ public class CreateUdongRequest {
     private List<Long> cityIds;
 
     @NotBlank(message = "제목을 입력해주세요.")
-    @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
+    @Size(min = 1, max = 100, message = "제목은 100자 이내로 작성해주세요.")
     private String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
-    @Size(max = 1000, message = "내용은 1000자 이내로 작성해주세요.")
+    @Size(min = 1, max = 1000, message = "내용은 1000자 이내로 작성해주세요.")
     private String description;
 
     @Min(value = 1, message = "모집 인원은 1명 이상이어야 합니다.")
