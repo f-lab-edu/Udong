@@ -6,6 +6,7 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.udong.domain.*;
+import com.hyun.udong.udong.infrastructure.repository.ParticipantRepository;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.presentation.dto.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.UdongResponse;
@@ -23,6 +24,7 @@ public class UdongService {
     private final MemberRepository memberRepository;
     private final CityRepository cityRepository;
     private final UdongRepository udongRepository;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public UdongResponse createUdong(CreateUdongRequest request, Long memberId) {
@@ -40,13 +42,10 @@ public class UdongService {
                 .build();
 
         udong.addCities(cities);
+        udongRepository.save(udong);
+        Participant owner = participantRepository.save(Participant.from(memberId, udong));
 
-        Udong savedUdong = udongRepository.save(udong);
-
-        List<Member> participants = memberRepository.findAllById(
-                savedUdong.getParticipants().stream()
-                        .map(Participant::getMemberId)
-                        .toList());
-        return UdongResponse.from(udong, participants);
+        List<Member> participantMembers = memberRepository.findAllById(List.of(owner.getMemberId()));
+        return UdongResponse.from(udong, participantMembers);
     }
 }

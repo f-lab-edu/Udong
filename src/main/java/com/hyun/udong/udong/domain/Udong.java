@@ -46,11 +46,6 @@ public class Udong extends BaseTimeEntity {
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Participant> participants = new ArrayList<>();
-
-    @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WaitingMember> waitingMembers = new ArrayList<>();
 
     @Builder
     public Udong(Content content,
@@ -71,7 +66,6 @@ public class Udong extends BaseTimeEntity {
         } else {
             this.status = UdongStatus.PREPARE;
         }
-        addParticipant(ownerId);
     }
 
     public void addCities(List<City> cities) {
@@ -86,14 +80,5 @@ public class Udong extends BaseTimeEntity {
             TravelCity travelCity = new TravelCity(this, city);
             travelCities.add(travelCity);
         }
-    }
-
-    public void addParticipant(Long memberId) {
-        Participant participant = Participant.from(memberId, this);
-        participants.add(participant);
-    }
-
-    public int getCurrentParticipantsSize() {
-        return participants.size();
     }
 }

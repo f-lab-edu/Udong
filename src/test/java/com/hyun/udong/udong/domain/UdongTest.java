@@ -40,7 +40,6 @@ class UdongTest {
         Udong udong = createUdong(content, recruitPlanner, travelPlanner, attachedTags);
 
         assertThat(udong.getContent().getTitle()).isEqualTo("여행 동행 모집");
-        assertThat(udong.getCurrentParticipantsSize()).isEqualTo(1);
         assertThat(udong.getRecruitPlanner().getRecruitmentCount()).isEqualTo(5);
         assertThat(udong.getTravelPlanner().getStartDate()).isEqualTo(LocalDate.now().plusDays(5));
         assertThat(udong.getAttachedTags().getTags()).contains("자연", "배낭여행");
