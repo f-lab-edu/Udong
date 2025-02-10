@@ -26,7 +26,7 @@ public class AttachedTags {
 
     private void validate(Set<String> tags) {
         if (tags.size() > MAX_TAGS_SIZE) {
-            throw new InvalidParameterException("태그는 5개 이하로 설정해야 합니다.");
+            throw new InvalidParameterException("태그는 " + MAX_TAGS_SIZE + "개 이하로 설정해야 합니다.");
         }
     }
 
