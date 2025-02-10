@@ -65,7 +65,7 @@ class UdongServiceTest {
         then(response.getStartDate()).isEqualTo(request.getStartDate());
         then(response.getEndDate()).isEqualTo(request.getEndDate());
         then(response.getTags()).isEqualTo(Set.copyOf(request.getTags()));
-        then(response.getCurrentMemberCount()).isEqualTo(1);
+        then(response.getCurrentParticipantsCount()).isEqualTo(1);
         then(response.getParticipants()).hasSize(1);
         then(response.getParticipants().get(0).id()).isEqualTo(member.getId());
         then(response.getParticipants().get(0).name()).isEqualTo(member.getNickname());

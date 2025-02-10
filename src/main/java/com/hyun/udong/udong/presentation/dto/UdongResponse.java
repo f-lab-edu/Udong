@@ -18,11 +18,11 @@ public class UdongResponse {
     private final Long id;
     private final String title;
     private final String description;
-    private final int currentMemberCount;
     private final Set<String> tags;
     private final String status;
     private final Long ownerId;
     private final List<ParticipantResponse> participants;
+    private final int currentParticipantsCount;
     @DateFormat
     private final LocalDate startDate;
     @DateFormat
@@ -37,18 +37,18 @@ public class UdongResponse {
                          String status,
                          Long ownerId,
                          List<ParticipantResponse> participants,
-                         int currentMemberCount,
+                         int currentParticipantsCount,
                          LocalDate startDate,
                          LocalDate endDate,
                          LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.currentMemberCount = currentMemberCount;
         this.tags = tags;
         this.status = status;
         this.ownerId = ownerId;
         this.participants = participants;
+        this.currentParticipantsCount = currentParticipantsCount;
         this.startDate = startDate;
         this.endDate = endDate;
         this.createdAt = createdAt;
