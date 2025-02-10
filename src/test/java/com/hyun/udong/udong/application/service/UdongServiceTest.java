@@ -26,7 +26,6 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 @SpringBootTest
 class UdongServiceTest {
 
-    public static final long NOT_EXISTS_MEMBER_ID = 999L;
     public static final long NOT_EXISTS_CITY_ID = 999L;
     public static final long CITY_ID_OF_SEOUL = 1L;
     public static final long CITY_ID_OF_BUSAN = 2L;
