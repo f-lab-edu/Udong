@@ -18,7 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class AttachedTags {
 
-    public static final int MAX_TAGS_SIZE = 5;
+    private static final int MAX_TAGS_SIZE = 5;
 
     @ElementCollection
     @CollectionTable(name = "udong_tags", joinColumns = @JoinColumn(name = "udong_id"))

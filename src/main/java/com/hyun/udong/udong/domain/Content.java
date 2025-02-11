@@ -13,10 +13,10 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class Content {
 
-    public static final int MIN_TITLE_SIZE = 1;
-    public static final int MAX_TITLE_SIZE = 100;
-    public static final int MIN_DESCRIPTION_SIZE = 1;
-    public static final int MAX_DESCRIPTION_SIZE = 1000;
+    private static final int MIN_TITLE_SIZE = 1;
+    private static final int MAX_TITLE_SIZE = 100;
+    private static final int MIN_DESCRIPTION_SIZE = 1;
+    private static final int MAX_DESCRIPTION_SIZE = 1000;
 
     @Column(nullable = false)
     private String title;

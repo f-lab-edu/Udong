@@ -12,8 +12,8 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class RecruitPlanner {
 
-    public static final int MIN_RECRUIT_COUNT = 2;
-    public static final int MAX_RECRUIT_COUNT = 10;
+    private static final int MIN_RECRUIT_COUNT = 2;
+    private static final int MAX_RECRUIT_COUNT = 10;
 
     private int recruitmentCount;
 
