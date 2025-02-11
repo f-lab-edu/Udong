@@ -11,7 +11,9 @@ public enum ErrorCode {
     INVALID_TOKEN(UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     TOKEN_EXPIRED(UNAUTHORIZED, "만료된 토큰입니다."),
     UNAUTHENTICATED_MEMBER(UNAUTHORIZED, "인증되지 않은 회원입니다."),
-    NOT_FOUND(BAD_REQUEST);
+    NOT_FOUND(BAD_REQUEST),
+    INVALID_PARAMETER(BAD_REQUEST, "잘못된 입력값입니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;

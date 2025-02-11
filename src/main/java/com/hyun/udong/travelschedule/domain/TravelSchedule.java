@@ -22,11 +22,13 @@ public class TravelSchedule extends BaseTimeEntity {
     @Column(name = "travel_schedule_id")
     private Long id;
 
+    @Column(nullable = false)
     private LocalDate startDate;
 
+    @Column(nullable = false)
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "travelSchedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "travelSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelScheduleCity> travelScheduleCities = new ArrayList<>();
 
     @Builder

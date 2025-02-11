@@ -16,10 +16,11 @@ public class City {
     @Column(name = "city_id")
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id", nullable = false)
+    @JoinColumn(name = "country_id", nullable = false, updatable = false)
     private Country country;
 
 }

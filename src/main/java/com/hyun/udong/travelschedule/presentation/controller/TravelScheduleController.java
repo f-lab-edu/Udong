@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/travel")
+@RequestMapping("/api/travel")
 public class TravelScheduleController {
 
     private final TravelScheduleService travelScheduleService;
