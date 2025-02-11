@@ -19,7 +19,7 @@ public class RecruitPlanner {
 
     private void validate(int recruitmentCount) {
         if (recruitmentCount < MIN_RECRUIT_COUNT || recruitmentCount > MAX_RECRUIT_COUNT) {
-            throw new InvalidParameterException("모집 인원은 2명 이상 10명 이하로 설정해야 합니다.");
+            throw new InvalidParameterException("모집 인원은 " + MIN_RECRUIT_COUNT + "명 이상 " + MAX_RECRUIT_COUNT + "명 이하로 설정해야 합니다.");
         }
     }
 
