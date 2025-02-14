@@ -35,7 +35,7 @@ public class UdongRepositoryImpl implements UdongRepositoryCustom {
                 )
                 .orderBy(udong.id.desc())
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
+                .limit(pageable.getPageSize())
                 .fetch();
 
         long total = Optional.ofNullable(queryFactory
