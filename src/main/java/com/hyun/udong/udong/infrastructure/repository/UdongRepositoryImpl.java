@@ -1,7 +1,7 @@
 package com.hyun.udong.udong.infrastructure.repository;
 
 import com.hyun.udong.udong.domain.Udong;
-import com.hyun.udong.udong.presentation.dto.FindUdongsCondition;
+import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

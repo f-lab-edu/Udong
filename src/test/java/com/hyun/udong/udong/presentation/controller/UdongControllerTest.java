@@ -5,7 +5,7 @@ import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
-import com.hyun.udong.udong.presentation.dto.CreateUdongRequest;
+import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;

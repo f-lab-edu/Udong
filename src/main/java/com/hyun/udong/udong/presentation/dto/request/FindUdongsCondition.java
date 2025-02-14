@@ -1,4 +1,4 @@
-package com.hyun.udong.udong.presentation.dto;
+package com.hyun.udong.udong.presentation.dto.request;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;

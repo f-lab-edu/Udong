@@ -3,7 +3,7 @@ package com.hyun.udong.udong.infrastructure.repository;
 import com.hyun.udong.common.config.QueryDslConfig;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.udong.domain.*;
-import com.hyun.udong.udong.presentation.dto.FindUdongsCondition;
+import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

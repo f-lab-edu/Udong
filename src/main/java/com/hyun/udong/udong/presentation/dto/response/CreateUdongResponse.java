@@ -1,4 +1,4 @@
-package com.hyun.udong.udong.presentation.dto;
+package com.hyun.udong.udong.presentation.dto.response;
 
 import com.hyun.udong.common.annotation.DateFormat;
 import com.hyun.udong.member.domain.Member;
