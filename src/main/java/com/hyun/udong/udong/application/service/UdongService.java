@@ -60,20 +60,29 @@ public class UdongService {
     public PagedResponse<SimpleUdongResponse> findUdongs(FindUdongsCondition request, Pageable pageable) {
         Page<Udong> udongPage = udongRepository.findByFilter(request, pageable);
 
-        List<Long> udongIds = udongPage.getContent().stream()
+        Map<Long, Integer> participantCounts = getParticipantCounts(udongPage.getContent());
+
+        List<SimpleUdongResponse> udongResponses = convertToResponse(udongPage.getContent(), participantCounts);
+        return PagedResponse.of(new PageImpl<>(udongResponses, pageable, udongPage.getTotalElements()));
+    }
+
+
+    private Map<Long, Integer> getParticipantCounts(List<Udong> udongs) {
+        List<Long> udongIds = udongs.stream()
                 .map(Udong::getId)
                 .toList();
 
-        Map<Long, Integer> participantCounts = participantRepository.countParticipantsByUdongIds(udongIds).stream()
+        return participantRepository.countParticipantsByUdongIds(udongIds).stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> ((Number) row[1]).intValue()
                 ));
+    }
 
-        List<SimpleUdongResponse> udongResponses = udongPage.getContent().stream()
+    private static List<SimpleUdongResponse> convertToResponse(List<Udong> udongs, Map<Long, Integer> participantCounts) {
+        return udongs.stream()
                 .map(udong -> SimpleUdongResponse.from(
                         udong, participantCounts.getOrDefault(udong.getId(), 0)))
                 .toList();
-        return PagedResponse.of(new PageImpl<>(udongResponses, pageable, udongPage.getTotalElements()));
     }
 }
