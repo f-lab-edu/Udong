@@ -16,12 +16,13 @@ import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,15 +58,22 @@ public class UdongService {
     }
 
     public PagedResponse<SimpleUdongResponse> findUdongs(FindUdongsCondition request, Pageable pageable) {
-        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-        Page<Udong> udongPage = udongRepository.findByFilter(request, pageRequest);
+        Page<Udong> udongPage = udongRepository.findByFilter(request, pageable);
+
+        List<Long> udongIds = udongPage.getContent().stream()
+                .map(Udong::getId)
+                .toList();
+
+        Map<Long, Integer> participantCounts = participantRepository.countParticipantsByUdongIds(udongIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Number) row[1]).intValue()
+                ));
 
         List<SimpleUdongResponse> udongResponses = udongPage.getContent().stream()
-                .map(udong -> {
-                    int currentParticipantsCount = participantRepository.countByUdongId(udong.getId());
-                    return SimpleUdongResponse.from(udong, currentParticipantsCount);
-                })
+                .map(udong -> SimpleUdongResponse.from(
+                        udong, participantCounts.getOrDefault(udong.getId(), 0)))
                 .toList();
-        return PagedResponse.of(new PageImpl<>(udongResponses, pageRequest, udongPage.getTotalElements()));
+        return PagedResponse.of(new PageImpl<>(udongResponses, pageable, udongPage.getTotalElements()));
     }
 }

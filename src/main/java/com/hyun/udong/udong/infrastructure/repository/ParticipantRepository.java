@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ParticipantRepository extends JpaRepository<Participant, Long> {
+import java.util.List;
 
-    @Query("SELECT COUNT(p) FROM Participant p WHERE p.udong.id = :udongId")
-    int countByUdongId(@Param("udongId") Long udongId);
+public interface ParticipantRepository extends JpaRepository<Participant, Long> {
+    @Query("SELECT p.udong.id, COUNT(p) FROM Participant p WHERE p.udong.id IN :udongIds GROUP BY p.udong.id")
+    List<Object[]> countParticipantsByUdongIds(@Param("udongIds") List<Long> udongIds);
 }
