@@ -12,6 +12,7 @@ import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.ParticipantCountResponse;
 import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,30 +58,30 @@ public class UdongService {
 
     public PagedResponse<SimpleUdongResponse> findUdongs(FindUdongsCondition request, Pageable pageable) {
         Page<Udong> udongPage = udongRepository.findByFilter(request, pageable);
-
-        Map<Long, Integer> participantCounts = getParticipantCounts(udongPage.getContent());
+        List<ParticipantCountResponse> participantCounts = getParticipantCounts(udongPage.getContent());
 
         List<SimpleUdongResponse> udongResponses = convertToResponse(udongPage.getContent(), participantCounts);
         return PagedResponse.of(new PageImpl<>(udongResponses, pageable, udongPage.getTotalElements()));
     }
 
-
-    private Map<Long, Integer> getParticipantCounts(List<Udong> udongs) {
+    private List<ParticipantCountResponse> getParticipantCounts(List<Udong> udongs) {
         List<Long> udongIds = udongs.stream()
                 .map(Udong::getId)
                 .toList();
 
-        return participantRepository.countParticipantsByUdongIds(udongIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> ((Number) row[1]).intValue()
-                ));
+        return participantRepository.countParticipantsByUdongIds(udongIds);
     }
 
-    private static List<SimpleUdongResponse> convertToResponse(List<Udong> udongs, Map<Long, Integer> participantCounts) {
+    private static List<SimpleUdongResponse> convertToResponse(List<Udong> udongs, List<ParticipantCountResponse> participantCounts) {
         return udongs.stream()
-                .map(udong -> SimpleUdongResponse.from(
-                        udong, participantCounts.getOrDefault(udong.getId(), 0)))
+                .map(udong -> {
+                    int count = participantCounts.stream()
+                            .filter(participant -> participant.udongId().equals(udong.getId()))
+                            .findFirst()
+                            .map(ParticipantCountResponse::participantCount)
+                            .orElse(0);
+                    return SimpleUdongResponse.from(udong, count);
+                })
                 .toList();
     }
 }
