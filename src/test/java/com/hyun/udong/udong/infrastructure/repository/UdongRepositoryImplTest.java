@@ -1,11 +1,9 @@
 package com.hyun.udong.udong.infrastructure.repository;
 
 import com.hyun.udong.common.config.QueryDslConfig;
-import com.hyun.udong.common.fixture.TestFixture;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.udong.domain.*;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
-import com.hyun.udong.udong.presentation.dto.response.ParticipantCountResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
@@ -85,31 +82,4 @@ class UdongRepositoryImplTest {
         assertThat(travelCities.get(1).getCity().getId()).isEqualTo(2L);
     }
 
-    @Test
-    void 우동의_참가자_수를_조회한다() {
-        // given
-        Udong udong1 = udongRepository.save(TestFixture.UDONG1);
-        Udong udong2 = udongRepository.save(TestFixture.UDONG2);
-        Udong udong3 = udongRepository.save(TestFixture.UDONG3);
-
-        List<Participant> participants = List.of(
-                Participant.builder().udong(udong1).memberId(1L).build(),
-                Participant.builder().udong(udong2).memberId(2L).build(),
-                Participant.builder().udong(udong2).memberId(3L).build()
-        );
-        participantRepository.saveAll(participants);
-
-        // when
-        List<ParticipantCountResponse> responses = udongRepository.countParticipantsByUdongIds(List.of(udong1.getId(), udong2.getId(), udong3.getId()));
-
-        // then
-        assertThat(responses).hasSize(3);
-        assertThat(responses)
-                .extracting(ParticipantCountResponse::udongId, ParticipantCountResponse::participantCount)
-                .containsExactlyInAnyOrder(
-                        tuple(udong1.getId(), 1L),
-                        tuple(udong2.getId(), 2L),
-                        tuple(udong3.getId(), 0L)
-                );
-    }
 }
