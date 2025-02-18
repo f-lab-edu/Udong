@@ -1,4 +1,4 @@
-package com.hyun.udong.udong.presentation.dto;
+package com.hyun.udong.udong.presentation.dto.response;
 
 import com.hyun.udong.common.annotation.DateFormat;
 import com.hyun.udong.member.domain.Member;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Getter
 @Builder
-public class UdongResponse {
+public class CreateUdongResponse {
 
     private final Long id;
     private final String title;
@@ -30,17 +30,17 @@ public class UdongResponse {
     @DateFormat
     private final LocalDateTime createdAt;
 
-    public UdongResponse(Long id,
-                         String title,
-                         String description,
-                         Set<String> tags,
-                         String status,
-                         Long ownerId,
-                         List<ParticipantResponse> participants,
-                         int currentParticipantsCount,
-                         LocalDate startDate,
-                         LocalDate endDate,
-                         LocalDateTime createdAt) {
+    public CreateUdongResponse(Long id,
+                               String title,
+                               String description,
+                               Set<String> tags,
+                               String status,
+                               Long ownerId,
+                               List<ParticipantResponse> participants,
+                               int currentParticipantsCount,
+                               LocalDate startDate,
+                               LocalDate endDate,
+                               LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -54,8 +54,8 @@ public class UdongResponse {
         this.createdAt = createdAt;
     }
 
-    public static UdongResponse from(Udong udong, List<Member> participants) {
-        return new UdongResponse(
+    public static CreateUdongResponse from(Udong udong, List<Member> participants) {
+        return new CreateUdongResponse(
                 udong.getId(),
                 udong.getContent().getTitle(),
                 udong.getContent().getDescription(),
