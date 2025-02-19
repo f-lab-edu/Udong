@@ -6,7 +6,7 @@ start-project:
 	docker compose -f $(PROJECT_COMPOSE) --env-file .env.prod up --build -d
 
 stop-project:
-	docker compose -f $(PROJECT_COMPOSE) down
+	docker compose -f $(PROJECT_COMPOSE) stop
 
 logs-project:
 	docker compose -f $(PROJECT_COMPOSE) logs -f
@@ -15,7 +15,7 @@ start-monitoring:
 	docker compose -f $(MONITORING_COMPOSE) up --build -d
 
 stop-monitoring:
-	docker compose -f $(MONITORING_COMPOSE) down
+	docker compose -f $(MONITORING_COMPOSE) stop
 
 logs-monitoring:
 	docker compose -f $(MONITORING_COMPOSE) logs -f
