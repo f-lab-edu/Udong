@@ -1,5 +1,6 @@
 package com.hyun.udong.udong.application.service;
 
+import com.hyun.udong.common.dto.PagedResponse;
 import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
@@ -7,18 +8,24 @@ import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.udong.domain.Udong;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
-import com.hyun.udong.udong.presentation.dto.CreateUdongRequest;
-import com.hyun.udong.udong.presentation.dto.UdongResponse;
+import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
+import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
+import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
@@ -54,7 +61,7 @@ class UdongServiceTest {
                 List.of("여행", "맛집"));
 
         // when
-        UdongResponse response = udongService.createUdong(request, member.getId());
+        CreateUdongResponse response = udongService.createUdong(request, member.getId());
         Udong savedUdong = udongRepository.findById(response.getId()).orElseThrow();
 
         // then
@@ -91,5 +98,39 @@ class UdongServiceTest {
         thenThrownBy(() -> udongService.createUdong(request, member.getId()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 도시가 존재하지 않습니다.");
+    }
+
+
+    @Test
+    @Sql(scripts = "/insert_udong_data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+    void 검색_조건_없이_전체_우동_조회() {
+        // given
+        FindUdongsCondition searchCondition = new FindUdongsCondition(null, null, null, null, null);
+
+        // when
+        PagedResponse<SimpleUdongResponse> udongs = udongService.findUdongs(searchCondition, Pageable.ofSize(20));
+
+        // then
+        assertThat(udongs).isNotNull();
+        assertThat(udongs.content()).hasSize(20);
+    }
+
+    @Test
+    @Sql(scripts = "/insert_udong_data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+    void 특정_기간_필터링_우동_조회() {
+        // given
+        LocalDate startDate = LocalDate.of(2025, 11, 1);
+        LocalDate endDate = LocalDate.of(2025, 11, 10);
+        FindUdongsCondition searchCondition = new FindUdongsCondition(null, null, startDate, endDate, null);
+
+        // when
+        PagedResponse<SimpleUdongResponse> result = udongService.findUdongs(searchCondition, Pageable.ofSize(20));
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.content()).hasSize(18);
+        assertThat(result.content().stream()
+                .allMatch(udong -> udong.getStartDate().isEqual(startDate)
+                        && udong.getEndDate().isEqual(endDate))).isTrue();
     }
 }

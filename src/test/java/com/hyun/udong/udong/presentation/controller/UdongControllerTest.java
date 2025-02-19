@@ -5,7 +5,7 @@ import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
-import com.hyun.udong.udong.presentation.dto.CreateUdongRequest;
+import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -104,5 +105,66 @@ class UdongControllerTest {
 
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void 검색_조건_없이_전체_우동_조회() {
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+
+                .when()
+                .get("/api/udongs")
+
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body("content", not(empty()))
+                .body("totalElements", equalTo(20));
+    }
+
+    @Test
+    @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void 검색_조건_없이_전체_우동_조회_페이징() {
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+
+                .when()
+                .get("/api/udongs")
+
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body("content", not(empty()))
+                .body("totalElements", equalTo(20))
+                .body("totalPages", equalTo(2))
+                .body("hasNextPage", equalTo(true));
+    }
+
+    @Test
+    @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void 특정_기간_필터링_우동_조회() {
+        LocalDate startDate = LocalDate.of(2025, 9, 1);
+        LocalDate endDate = LocalDate.of(2025, 9, 10);
+
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+
+                .when()
+                .get("/api/udongs")
+
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body("content", not(empty()))
+                .body("content.startDate", everyItem(equalTo(startDate.toString())))
+                .body("content.endDate", everyItem(equalTo(endDate.toString())));
     }
 }

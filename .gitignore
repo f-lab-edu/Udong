@@ -46,3 +46,6 @@ out/
 *.tmp
 *.bak
 *.backup
+
+# queryDSL 관련
+generated
