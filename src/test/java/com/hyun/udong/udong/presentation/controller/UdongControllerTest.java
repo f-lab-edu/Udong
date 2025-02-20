@@ -142,7 +142,7 @@ class UdongControllerTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .body("content", not(empty()))
-                .body("totalElements", equalTo(20));
+                .body("totalElements", equalTo(21));
     }
 
     @Test
@@ -161,8 +161,8 @@ class UdongControllerTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .body("content", not(empty()))
-                .body("totalElements", equalTo(20))
-                .body("totalPages", equalTo(2))
+                .body("totalElements", equalTo(21))
+                .body("totalPages", equalTo(3))
                 .body("hasNextPage", equalTo(true));
     }
 
