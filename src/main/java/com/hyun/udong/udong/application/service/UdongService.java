@@ -60,49 +60,17 @@ public class UdongService {
     }
 
     public PagedResponse<SimpleUdongResponse> findUdongs(FindUdongsCondition request, Pageable pageable) {
-        Page<Udong> udongPage = udongRepository.findByFilter(request, pageable);
-        List<ParticipantCountResponse> participantCounts = getParticipantCounts(udongPage.getContent());
-
-        List<SimpleUdongResponse> udongResponses = convertToResponse(udongPage.getContent(), participantCounts);
-        return PagedResponse.of(new PageImpl<>(udongResponses, pageable, udongPage.getTotalElements()));
-    }
-
-    private List<ParticipantCountResponse> getParticipantCounts(List<Udong> udongs) {
-        List<Long> udongIds = udongs.stream()
-                .map(Udong::getId)
-                .toList();
-
-        return participantRepository.countParticipantsByUdongIds(udongIds);
-    }
-
-    private static List<SimpleUdongResponse> convertToResponse(List<Udong> udongs, List<ParticipantCountResponse> participantCounts) {
-        return udongs.stream()
-                .map(udong -> {
-                    int count = participantCounts.stream()
-                            .filter(participant -> participant.udongId().equals(udong.getId()))
-                            .findFirst()
-                            .map(ParticipantCountResponse::participantCount)
-                            .orElse(0L).intValue();
-                    return SimpleUdongResponse.from(udong, count);
-                })
-                .toList();
+        Page<Udong> udongs = udongRepository.findByFilter(request, pageable);
+        List<ParticipantCountResponse> counts = getParticipantCounts(udongs.getContent());
+        List<SimpleUdongResponse> responses = mapToResponses(udongs.getContent(), counts);
+        return PagedResponse.of(new PageImpl<>(responses, pageable, udongs.getTotalElements()));
     }
 
     @Transactional
     public void requestParticipation(Long udongId, Long memberId) {
-        Udong udong = udongRepository.findById(udongId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+        Udong udong = findUdongById(udongId);
 
-        List<Participant> participants = participantRepository.findByUdong(udong);
-        udong.validateParticipation(memberId, participants.size());
-
-        if (participantRepository.existsByUdongAndMemberId(udong, memberId)) {
-            throw new InvalidParticipationException("이미 참여 중인 우동입니다.");
-        }
-
-        if (waitingMemberRepository.existsByUdongAndMemberId(udong, memberId)) {
-            throw new InvalidParticipationException("이미 요청을 보낸 우동입니다.");
-        }
+        validateParticipationRequest(memberId, udong);
 
         WaitingMember waitingMember = WaitingMember.builder()
                 .udong(udong)
@@ -113,26 +81,65 @@ public class UdongService {
 
     @Transactional
     public void approveParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
-        Udong udong = udongRepository.findById(udongId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+        Udong udong = findUdongById(udongId);
         udong.validateOwner(ownerId);
 
-        WaitingMember waitingMember = waitingMemberRepository.findByUdongAndMemberId(udong, waitingMemberId)
-                .orElseThrow(() -> new NotFoundException("해당 대기자를 찾을 수 없습니다."));
-
+        WaitingMember waitingMember = findWaitingMember(waitingMemberId, udong);
         waitingMemberRepository.delete(waitingMember);
         participantRepository.save(Participant.from(waitingMember.getMemberId(), udong));
     }
 
     @Transactional
     public void rejectParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
-        Udong udong = udongRepository.findById(udongId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+        Udong udong = findUdongById(udongId);
         udong.validateOwner(ownerId);
 
-        WaitingMember waitingMember = waitingMemberRepository.findByUdongAndMemberId(udong, waitingMemberId)
-                .orElseThrow(() -> new NotFoundException("해당 대기자를 찾을 수 없습니다."));
-
+        WaitingMember waitingMember = findWaitingMember(waitingMemberId, udong);
         waitingMemberRepository.delete(waitingMember);
+    }
+
+    private List<ParticipantCountResponse> getParticipantCounts(List<Udong> udongs) {
+        List<Long> udongIds = udongs.stream()
+                .map(Udong::getId)
+                .toList();
+
+        return participantRepository.countParticipantsByUdongIds(udongIds);
+    }
+
+    private List<SimpleUdongResponse> mapToResponses(List<Udong> udongs, List<ParticipantCountResponse> counts) {
+        return udongs.stream()
+                .map(udong -> SimpleUdongResponse.from(udong, getCount(udong, counts)))
+                .toList();
+    }
+
+    private int getCount(Udong udong, List<ParticipantCountResponse> counts) {
+        return counts.stream()
+                .filter(count -> count.udongId().equals(udong.getId()))
+                .findFirst()
+                .map(count -> count.participantCount().intValue())
+                .orElse(0);
+    }
+
+    private void validateParticipationRequest(Long memberId, Udong udong) {
+        List<Participant> participants = participantRepository.findByUdong(udong);
+        udong.validateParticipation(memberId, participants.size());
+
+        if (participantRepository.existsByUdongAndMemberId(udong, memberId)) {
+            throw new InvalidParticipationException("이미 참여 중인 우동입니다.");
+        }
+
+        if (waitingMemberRepository.existsByUdongAndMemberId(udong, memberId)) {
+            throw new InvalidParticipationException("이미 요청을 보낸 우동입니다.");
+        }
+    }
+
+    private Udong findUdongById(Long udongId) {
+        return udongRepository.findById(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+    }
+
+    private WaitingMember findWaitingMember(Long waitingMemberId, Udong udong) {
+        return waitingMemberRepository.findByUdongAndMemberId(udong, waitingMemberId)
+                .orElseThrow(() -> new NotFoundException("해당 대기자를 찾을 수 없습니다."));
     }
 }
