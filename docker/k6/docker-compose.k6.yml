@@ -1,0 +1,14 @@
+services:
+  k6:
+    image: grafana/k6:latest
+    container_name: k6
+    ports:
+      - "6565:6565"
+    volumes:
+      - ./script.js:/script.js
+    command: run /script.js
+    network_mode: host
+
+networks:
+  monitoring:
+    driver: bridge

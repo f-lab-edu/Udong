@@ -34,7 +34,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     runtimeOnly 'com.h2database:h2'
@@ -49,6 +48,9 @@ dependencies {
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 }
 
 tasks.named('test') {

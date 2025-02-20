@@ -35,7 +35,8 @@ pgdata/
 # Spring Boot 관련
 application-*.properties
 application-*.yml
-.env
+.env.local
+.env.prod
 
 # 테스트 보고서 및 빌드 도구 파일
 /test-output/
