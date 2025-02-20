@@ -101,7 +101,7 @@ public class Udong extends BaseTimeEntity {
             throw new InvalidParticipationException("여행이 시작되었거나 종료된 우동에는 참여할 수 없습니다.");
         }
 
-        if (ownerId.equals(memberId)) {
+        if (isOwner(memberId)) {
             throw new InvalidParticipationException("자신이 생성한 우동에는 참여할 수 없습니다.");
         }
 
@@ -111,8 +111,12 @@ public class Udong extends BaseTimeEntity {
     }
 
     public void validateOwner(Long ownerId) {
-        if (!this.ownerId.equals(ownerId)) {
+        if (!isOwner(ownerId)) {
             throw new InvalidParticipationException("승인/거부할 권한이 없습니다.");
         }
+    }
+
+    public boolean isOwner(Long memberId) {
+        return this.ownerId.equals(memberId);
     }
 }
