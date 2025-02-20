@@ -38,6 +38,22 @@ public class UdongController {
     public ResponseEntity<Void> participantUdong(@PathVariable("udongId") Long udongId,
                                                  @LoginMember Member member) {
         udongService.requestParticipation(udongId, member.getId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{udongId}/approve/{waitingMemberId}")
+    public ResponseEntity<Void> approveParticipant(@PathVariable("udongId") Long udongId,
+                                                   @PathVariable("waitingMemberId") Long waitingMemberId,
+                                                   @LoginMember Member member) {
+        udongService.approveParticipant(udongId, waitingMemberId, member.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{udongId}/reject/{waitingMemberId}")
+    public ResponseEntity<Void> rejectParticipant(@PathVariable("udongId") Long udongId,
+                                                  @PathVariable("waitingMemberId") Long waitingMemberId,
+                                                  @LoginMember Member member) {
+        udongService.rejectParticipant(udongId, waitingMemberId, member.getId());
+        return ResponseEntity.noContent().build();
     }
 }

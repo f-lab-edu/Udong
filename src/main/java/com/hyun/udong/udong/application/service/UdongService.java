@@ -110,4 +110,29 @@ public class UdongService {
                 .build();
         waitingMemberRepository.save(waitingMember);
     }
+
+    @Transactional
+    public void approveParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
+        Udong udong = udongRepository.findById(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+        udong.validateOwner(ownerId);
+
+        WaitingMember waitingMember = waitingMemberRepository.findByUdongAndMemberId(udong, waitingMemberId)
+                .orElseThrow(() -> new NotFoundException("해당 대기자를 찾을 수 없습니다."));
+
+        waitingMemberRepository.delete(waitingMember);
+        participantRepository.save(Participant.from(waitingMember.getMemberId(), udong));
+    }
+
+    @Transactional
+    public void rejectParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
+        Udong udong = udongRepository.findById(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+        udong.validateOwner(ownerId);
+
+        WaitingMember waitingMember = waitingMemberRepository.findByUdongAndMemberId(udong, waitingMemberId)
+                .orElseThrow(() -> new NotFoundException("해당 대기자를 찾을 수 없습니다."));
+
+        waitingMemberRepository.delete(waitingMember);
+    }
 }

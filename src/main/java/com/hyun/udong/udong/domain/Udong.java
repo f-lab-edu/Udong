@@ -109,4 +109,10 @@ public class Udong extends BaseTimeEntity {
             throw new InvalidParticipationException("모집 인원이 이미 다 찼습니다.");
         }
     }
+
+    public void validateOwner(Long ownerId) {
+        if (!this.ownerId.equals(ownerId)) {
+            throw new InvalidParticipationException("승인/거부할 권한이 없습니다.");
+        }
+    }
 }
