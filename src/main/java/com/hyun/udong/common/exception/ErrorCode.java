@@ -13,6 +13,7 @@ public enum ErrorCode {
     UNAUTHENTICATED_MEMBER(UNAUTHORIZED, "인증되지 않은 회원입니다."),
     NOT_FOUND(BAD_REQUEST),
     INVALID_PARAMETER(BAD_REQUEST, "잘못된 입력값입니다."),
+    INVALID_PARTICIPATION_REQUEST(BAD_REQUEST, "잘못된 참여 요청입니다."),
     ;
 
     private final HttpStatus status;
