@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 @ExtendWith(DataCleanerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TravelScheduleControllerTest {
+    private Member savedMember;
 
     @LocalServerPort
     private int port;
@@ -31,10 +32,13 @@ class TravelScheduleControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private TestOauth testOauth;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        memberRepository.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
+        savedMember = memberRepository.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
     }
 
     @Test
@@ -47,7 +51,7 @@ class TravelScheduleControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", testOauth.generateAccessToken(savedMember.getId()))
                 .body(request)
 
                 .when()
@@ -66,7 +70,7 @@ class TravelScheduleControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", testOauth.generateAccessToken(savedMember.getId()))
 
                 .when()
                 .post("/api/travel/schedule")

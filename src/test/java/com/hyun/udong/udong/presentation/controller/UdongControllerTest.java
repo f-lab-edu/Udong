@@ -35,6 +35,7 @@ class UdongControllerTest {
 
     private Udong udong;
     private Member member;
+    private String ownerToken;
 
     @LocalServerPort
     private int port;
@@ -51,6 +52,9 @@ class UdongControllerTest {
     @Autowired
     private WaitingMemberRepository waitingMemberRepository;
 
+    @Autowired
+    private TestOauth testOauth;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -62,6 +66,7 @@ class UdongControllerTest {
                 LocalDate.now(),
                 LocalDate.now().plusDays(5),
                 UdongStatus.PREPARE));
+        ownerToken = testOauth.generateAccessToken(member.getId());
     }
 
     @Test
@@ -78,7 +83,7 @@ class UdongControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
                 .body(request)
 
                 .when()
@@ -100,7 +105,7 @@ class UdongControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
 
                 .when()
                 .post("/api/udongs")
@@ -139,7 +144,7 @@ class UdongControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
 
                 .when()
                 .get("/api/udongs")
@@ -156,7 +161,7 @@ class UdongControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
                 .queryParam("page", 0)
                 .queryParam("size", 10)
 
@@ -174,13 +179,15 @@ class UdongControllerTest {
     @Test
     @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void 특정_기간_필터링_우동_조회() {
+        // given
         LocalDate startDate = LocalDate.of(2025, 9, 1);
         LocalDate endDate = LocalDate.of(2025, 9, 10);
 
+        // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
 
@@ -196,12 +203,14 @@ class UdongControllerTest {
 
     @Test
     void 우동_참여_요청_성공() {
-        memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
 
+        // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_2L)
+                .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
                 .post("/api/udongs/{udongId}/participate", udong.getId())
@@ -212,14 +221,15 @@ class UdongControllerTest {
 
     @Test
     void 이미_참여_중인_우동에_참여_요청시_실패() {
-        memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
-        participantRepository.save(Participant.from(2L, udong));
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
+        participantRepository.save(Participant.from(requestMember.getId(), udong));
 
         // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_2L)
+                .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
                 .post("/api/udongs/{udongId}/participate", udong.getId())
@@ -243,13 +253,13 @@ class UdongControllerTest {
         memberRepository.save(new Member(3L, SocialType.KAKAO, "훈이", "https://user3.com"));
         participantRepository.saveAll(List.of(Participant.from(2L, udong), Participant.from(3L, udong)));
 
-        memberRepository.save(new Member(4L, SocialType.KAKAO, "유리", "https://user4.com"));
+        Member requestMember = memberRepository.save(new Member(4L, SocialType.KAKAO, "유리", "https://user4.com"));
 
         // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_4L)
+                .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
                 .post("/api/udongs/{udongId}/participate", udong.getId())
@@ -261,16 +271,21 @@ class UdongControllerTest {
 
     @Test
     void 존재하지_않는_우동에_참여_요청시_실패() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
+
+        // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
                 .post("/api/udongs/{udongId}/participate", 999L)
 
                 .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", equalTo("존재하지 않는 우동입니다."));
     }
 
     @Test
@@ -284,18 +299,20 @@ class UdongControllerTest {
                 LocalDate.now(),
                 LocalDate.now().plusDays(5),
                 UdongStatus.IN_PROGRESS));
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
 
         // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
                 .post("/api/udongs/{udongId}/participate", udong.getId())
 
                 .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", equalTo("여행이 시작되었거나 종료된 우동에는 참여할 수 없습니다."));
     }
 
     @Test
@@ -311,7 +328,7 @@ class UdongControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
 
                 .when()
                 .post("/api/udongs/{udongId}/approve/{waitingMemberId}", udong.getId(), waitingMember.getId())
@@ -333,7 +350,7 @@ class UdongControllerTest {
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+                .header("Authorization", ownerToken)
 
                 .when()
                 .delete("/api/udongs/{udongId}/reject/{waitingMemberId}", udong.getId(), waitingMember.getId())
@@ -351,13 +368,13 @@ class UdongControllerTest {
                 .memberId(waitingMember.getId())
                 .build());
 
-        memberRepository.save(new Member(3L, SocialType.KAKAO, "훈이", "https://user3.com"));
+        Member notOwnerMember = memberRepository.save(new Member(3L, SocialType.KAKAO, "훈이", "https://user3.com"));
 
         // when & then
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", TestOauth.ACCESS_TOKEN_3L)
+                .header("Authorization", testOauth.generateAccessToken(notOwnerMember.getId()))
 
                 .when()
                 .post("/api/udongs/{udongId}/approve/{waitingMemberId}", udong.getId(), waitingMember.getId())
