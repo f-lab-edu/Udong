@@ -8,8 +8,10 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.udong.domain.Participant;
 import com.hyun.udong.udong.domain.Udong;
 import com.hyun.udong.udong.domain.UdongStatus;
+import com.hyun.udong.udong.domain.WaitingMember;
 import com.hyun.udong.udong.infrastructure.repository.ParticipantRepository;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
+import com.hyun.udong.udong.infrastructure.repository.WaitingMemberRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -45,6 +47,9 @@ class UdongControllerTest {
 
     @Autowired
     private ParticipantRepository participantRepository;
+
+    @Autowired
+    private WaitingMemberRepository waitingMemberRepository;
 
     @BeforeEach
     void setUp() {
@@ -202,7 +207,7 @@ class UdongControllerTest {
                 .post("/api/udongs/{udongId}/participate", udong.getId())
 
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -287,6 +292,74 @@ class UdongControllerTest {
 
                 .when()
                 .post("/api/udongs/{udongId}/participate", udong.getId())
+
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void 모임장이_대기자를_승인하면_참여자로_등록된다() {
+        // given
+        Member waitingMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://waiting.com"));
+        waitingMemberRepository.save(WaitingMember.builder()
+                .udong(udong)
+                .memberId(waitingMember.getId())
+                .build());
+
+        // when & then
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+
+                .when()
+                .post("/api/udongs/{udongId}/approve/{waitingMemberId}", udong.getId(), waitingMember.getId())
+
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void 모임장이_대기자를_거절하면_대기자리스트에서_삭제된다() {
+        // given
+        Member waitingMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://waiting.com"));
+        waitingMemberRepository.save(WaitingMember.builder()
+                .udong(udong)
+                .memberId(waitingMember.getId())
+                .build());
+
+        // when & then
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_1L)
+
+                .when()
+                .delete("/api/udongs/{udongId}/reject/{waitingMemberId}", udong.getId(), waitingMember.getId())
+
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void 모임장이_아닌_사용자가_승인요청하면_실패한다() {
+        // given
+        Member waitingMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://waiting.com"));
+        waitingMemberRepository.save(WaitingMember.builder()
+                .udong(udong)
+                .memberId(waitingMember.getId())
+                .build());
+
+        memberRepository.save(new Member(3L, SocialType.KAKAO, "훈이", "https://user3.com"));
+
+        // when & then
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", TestOauth.ACCESS_TOKEN_3L)
+
+                .when()
+                .post("/api/udongs/{udongId}/approve/{waitingMemberId}", udong.getId(), waitingMember.getId())
 
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());

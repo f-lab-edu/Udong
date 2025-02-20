@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 class UdongTest {
 
+    public static final long NOT_EXISTS_MEMBER_ID = 999L;
     private Content content;
     private RecruitPlanner recruitPlanner;
     private TravelPlanner travelPlanner;
@@ -106,9 +106,25 @@ class UdongTest {
         Udong udong = createUdong(UdongStatus.PREPARE);
         Long ownerId = udong.getOwnerId();
 
-        // when & then
         assertThatThrownBy(() -> udong.validateParticipation(ownerId, 0))
                 .isInstanceOf(InvalidParticipationException.class)
                 .hasMessage("자신이 생성한 우동에는 참여할 수 없습니다.");
+    }
+
+    @Test
+    void 모임장이_맞는지_검증한다() {
+        Udong udong = createUdong(UdongStatus.PREPARE);
+        Long ownerId = udong.getOwnerId();
+
+        assertThatCode(() -> udong.validateOwner(ownerId)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void 모임장이_아닌_사용자면_예외가_발생한다() {
+        Udong udong = createUdong(UdongStatus.PREPARE);
+
+        assertThatThrownBy(() -> udong.validateOwner(NOT_EXISTS_MEMBER_ID))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("승인/거부할 권한이 없습니다.");
     }
 }

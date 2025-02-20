@@ -211,4 +211,69 @@ class UdongServiceTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 우동입니다.");
     }
+
+    @Test
+    void 존재하지_않는_우동에_대기자_승인을_하면_예외가_발생한다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+        waitingMemberRepository.save(new WaitingMember(udong, requestMember.getId()));
+
+        // when & then
+        assertThatThrownBy(() -> udongService.approveParticipant(NOT_EXISTS_UDONG_ID, requestMember.getId(), udong.getOwnerId()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("존재하지 않는 우동입니다.");
+    }
+
+    @Test
+    void 존재하지_않는_대기자를_승인하면_예외가_발생한다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+
+        // when & then
+        assertThatThrownBy(() -> udongService.approveParticipant(udong.getId(), requestMember.getId(), udong.getOwnerId()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 대기자를 찾을 수 없습니다.");
+    }
+
+    @Test
+    void 모임장이_아닌_멤버가_대기자를_승인하면_예외가_발생한다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+        waitingMemberRepository.save(new WaitingMember(udong, requestMember.getId()));
+
+        Member notOwner = memberRepository.save(new Member(3L, SocialType.KAKAO, "gildong2", "profile_image"));
+
+        // when & then
+        assertThatThrownBy(() -> udongService.approveParticipant(udong.getId(), requestMember.getId(), notOwner.getId()))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("승인/거부할 권한이 없습니다.");
+    }
+
+    @Test
+    void 모임장이_대기자를_승인하면_참여자로_등록된다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+        waitingMemberRepository.save(new WaitingMember(udong, requestMember.getId()));
+
+        // when
+        udongService.approveParticipant(udong.getId(), requestMember.getId(), udong.getOwnerId());
+
+        // then
+        boolean isParticipant = participantRepository.existsByUdongAndMemberId(udong, requestMember.getId());
+        assertThat(isParticipant).isTrue();
+    }
+
+    @Test
+    void 모임장이_대기자를_거부하면_대기자가_삭제된다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+        waitingMemberRepository.save(new WaitingMember(udong, requestMember.getId()));
+
+        // when
+        udongService.rejectParticipant(udong.getId(), requestMember.getId(), udong.getOwnerId());
+
+        // then
+        boolean isExistsWaitingMember = waitingMemberRepository.existsByUdongAndMemberId(udong, requestMember.getId());
+        assertThat(isExistsWaitingMember).isFalse();
+    }
 }
