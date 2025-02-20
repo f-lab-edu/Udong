@@ -33,4 +33,11 @@ public class UdongController {
                                                         @LoginMember Member member) {
         return udongService.findUdongs(request, pageable);
     }
+
+    @PostMapping("/{udongId}/participate")
+    public ResponseEntity<Void> participantUdong(@PathVariable Long udongId,
+                                                 @LoginMember Member member) {
+        udongService.requestParticipation(udongId, member.getId());
+        return ResponseEntity.ok().build();
+    }
 }

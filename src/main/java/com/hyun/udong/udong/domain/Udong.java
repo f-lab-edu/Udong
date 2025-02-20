@@ -3,6 +3,7 @@ package com.hyun.udong.udong.domain;
 import com.hyun.udong.common.entity.BaseTimeEntity;
 import com.hyun.udong.common.exception.InvalidParameterException;
 import com.hyun.udong.travelschedule.domain.City;
+import com.hyun.udong.udong.exception.InvalidParticipationException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,6 +47,19 @@ public class Udong extends BaseTimeEntity {
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
 
+    public Udong(Long ownerId,
+                 String title,
+                 String description,
+                 int recruitmentCount,
+                 LocalDate startDate,
+                 LocalDate endDate,
+                 UdongStatus status) {
+        this.ownerId = ownerId;
+        this.content = Content.of(title, description);
+        this.recruitPlanner = RecruitPlanner.from(recruitmentCount);
+        this.travelPlanner = TravelPlanner.of(startDate, endDate);
+        this.status = status;
+    }
 
     @Builder
     public Udong(Content content,
@@ -79,6 +93,20 @@ public class Udong extends BaseTimeEntity {
         if (!isDuplicate) {
             TravelCity travelCity = new TravelCity(this, city);
             travelCities.add(travelCity);
+        }
+    }
+
+    public void validateParticipation(Long memberId) {
+        if (!status.isPrepare()) {
+            throw new InvalidParticipationException("여행이 시작되었거나 종료된 우동에는 참여할 수 없습니다.");
+        }
+
+        if (ownerId.equals(memberId)) {
+            throw new InvalidParticipationException("자신이 생성한 우동에는 참여할 수 없습니다.");
+        }
+
+        if (recruitPlanner.isFull()) {
+            throw new InvalidParticipationException("모집 인원이 다 찼습니다.");
         }
     }
 }

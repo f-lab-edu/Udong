@@ -13,4 +13,8 @@ public enum UdongStatus {
         }
         return PREPARE;
     }
+
+    public boolean isPrepare() {
+        return this.equals(PREPARE);
+    }
 }

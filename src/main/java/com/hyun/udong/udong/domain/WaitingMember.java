@@ -30,12 +30,6 @@ public class WaitingMember {
     private LocalDate requestDate;
 
     @Builder
-    public WaitingMember(Long memberId) {
-        this.memberId = memberId;
-        this.requestDate = LocalDate.now();
-    }
-
-    @Builder
     public WaitingMember(Udong udong, Long memberId) {
         this.udong = udong;
         this.memberId = memberId;

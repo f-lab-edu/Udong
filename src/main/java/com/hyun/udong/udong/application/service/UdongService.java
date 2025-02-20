@@ -7,8 +7,10 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.udong.domain.*;
+import com.hyun.udong.udong.exception.InvalidParticipationException;
 import com.hyun.udong.udong.infrastructure.repository.ParticipantRepository;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
+import com.hyun.udong.udong.infrastructure.repository.WaitingMemberRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
@@ -32,6 +34,7 @@ public class UdongService {
     private final CityRepository cityRepository;
     private final UdongRepository udongRepository;
     private final ParticipantRepository participantRepository;
+    private final WaitingMemberRepository waitingMemberRepository;
 
     @Transactional
     public CreateUdongResponse createUdong(CreateUdongRequest request, Long memberId) {
@@ -83,5 +86,27 @@ public class UdongService {
                     return SimpleUdongResponse.from(udong, count);
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void requestParticipation(Long udongId, Long memberId) {
+        Udong udong = udongRepository.findById(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+
+        udong.validateParticipation(memberId);
+
+        if (participantRepository.existsByUdongAndMemberId(udong, memberId)) {
+            throw new InvalidParticipationException("이미 참여 중인 우동입니다.");
+        }
+
+        if (waitingMemberRepository.existsByUdongAndMemberId(udong, memberId)) {
+            throw new InvalidParticipationException("이미 요청을 보낸 우동입니다.");
+        }
+
+        WaitingMember waitingMember = WaitingMember.builder()
+                .udong(udong)
+                .memberId(memberId)
+                .build();
+        waitingMemberRepository.save(waitingMember);
     }
 }

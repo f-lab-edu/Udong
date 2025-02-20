@@ -32,4 +32,7 @@ public class RecruitPlanner {
         return new RecruitPlanner(recruitmentCount);
     }
 
+    public boolean isFull() {
+        return recruitmentCount == MAX_RECRUIT_COUNT;
+    }
 }
