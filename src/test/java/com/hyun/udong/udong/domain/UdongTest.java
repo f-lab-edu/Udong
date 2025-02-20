@@ -1,6 +1,7 @@
 package com.hyun.udong.udong.domain;
 
 import com.hyun.udong.common.exception.InvalidParameterException;
+import com.hyun.udong.udong.exception.InvalidParticipationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,16 @@ class UdongTest {
                 .attachedTags(attachedTags)
                 .ownerId(1L)
                 .build();
+    }
+
+    private static Udong createUdong(UdongStatus status) {
+        return new Udong(1L,
+                "title",
+                "description",
+                5,
+                LocalDate.now(),
+                LocalDate.now().plusDays(5),
+                status);
     }
 
     @Test
@@ -78,5 +89,26 @@ class UdongTest {
         Udong udong = createUdong(content, recruitPlanner, travelPlanner, attachedTags);
 
         assertThat(udong.getStatus()).isEqualTo(UdongStatus.PREPARE);
+    }
+
+    @Test
+    void 진행전이_아닌_우동에는_참여할_수_없다() {
+        Udong udong = createUdong(UdongStatus.IN_PROGRESS);
+        Long memberId = 2L;
+
+        assertThatThrownBy(() -> udong.validateParticipation(memberId, 0))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("여행이 시작되었거나 종료된 우동에는 참여할 수 없습니다.");
+    }
+
+    @Test
+    void 자신이_생성한_우동에는_참여할_수_없다() {
+        Udong udong = createUdong(UdongStatus.PREPARE);
+        Long ownerId = udong.getOwnerId();
+
+        // when & then
+        assertThatThrownBy(() -> udong.validateParticipation(ownerId, 0))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("자신이 생성한 우동에는 참여할 수 없습니다.");
     }
 }

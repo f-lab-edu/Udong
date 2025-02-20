@@ -6,12 +6,19 @@ import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
+import com.hyun.udong.udong.domain.Participant;
 import com.hyun.udong.udong.domain.Udong;
+import com.hyun.udong.udong.domain.UdongStatus;
+import com.hyun.udong.udong.domain.WaitingMember;
+import com.hyun.udong.udong.exception.InvalidParticipationException;
+import com.hyun.udong.udong.infrastructure.repository.ParticipantRepository;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
+import com.hyun.udong.udong.infrastructure.repository.WaitingMemberRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
 import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
@@ -34,8 +42,11 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 class UdongServiceTest {
 
     private static final long NOT_EXISTS_CITY_ID = 999L;
+    private static final long NOT_EXISTS_UDONG_ID = 999L;
     private static final long CITY_ID_OF_SEOUL = 1L;
     private static final long CITY_ID_OF_BUSAN = 2L;
+
+    private Udong udong;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -45,6 +56,24 @@ class UdongServiceTest {
 
     @Autowired
     private UdongRepository udongRepository;
+
+    @Autowired
+    private WaitingMemberRepository waitingMemberRepository;
+
+    @Autowired
+    private ParticipantRepository participantRepository;
+
+    @BeforeEach
+    void setUp() {
+        Member owner = memberRepository.save(new Member(1L, SocialType.KAKAO, "hyun", "profile_image"));
+        udong = udongRepository.save(new Udong(owner.getId(),
+                "title",
+                "description",
+                5,
+                LocalDate.now(),
+                LocalDate.now().plusDays(5),
+                UdongStatus.PREPARE));
+    }
 
     @Test
     @Transactional
@@ -100,7 +129,6 @@ class UdongServiceTest {
                 .hasMessage("해당 도시가 존재하지 않습니다.");
     }
 
-
     @Test
     @Sql(scripts = "/insert_udong_data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
     void 검색_조건_없이_전체_우동_조회() {
@@ -132,5 +160,55 @@ class UdongServiceTest {
         assertThat(result.content().stream()
                 .allMatch(udong -> udong.getStartDate().isEqual(startDate)
                         && udong.getEndDate().isEqual(endDate))).isTrue();
+    }
+
+    @Test
+    void 멤버가_우동에_동행_요청을_보냄() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+
+        // when
+        udongService.requestParticipation(udong.getId(), requestMember.getId());
+
+        // then
+        boolean isExistsMember = waitingMemberRepository.existsByUdongAndMemberId(udong, requestMember.getId());
+        assertThat(isExistsMember).isTrue();
+    }
+
+    @Test
+    void 이미_참여_중인_우동에_동행_요청을_보내면_예외가_발생한다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+        participantRepository.save(Participant.from(requestMember.getId(), udong));
+
+        // when & then
+        assertThatThrownBy(() -> udongService.requestParticipation(udong.getId(), requestMember.getId()))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("이미 참여 중인 우동입니다.");
+    }
+
+    @Test
+    void 이미_대기_중인_우동에_동행_요청을_보내면_예외가_발생한다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+        waitingMemberRepository.save(new WaitingMember(udong, requestMember.getId()));
+
+        // when & then
+        assertThatThrownBy(() -> udongService.requestParticipation(udong.getId(), requestMember.getId()))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("이미 요청을 보낸 우동입니다.");
+    }
+
+    @Test
+    void 존재하지_않는_우동에_동행_요청을_보내면_예외가_발생한다() {
+        // given
+        Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "gildong", "profile_image"));
+
+        // when & then
+        assertThatThrownBy(() ->
+                udongService.requestParticipation(NOT_EXISTS_UDONG_ID, requestMember.getId())
+        )
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("존재하지 않는 우동입니다.");
     }
 }

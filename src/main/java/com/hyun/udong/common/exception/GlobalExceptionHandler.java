@@ -9,8 +9,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UdongException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(UdongException ex) {
-        ErrorCode errorCode = ex.getErrorCode();
-        ErrorResponse errorResponse = new ErrorResponse(errorCode.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
     }
 }
