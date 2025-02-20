@@ -96,7 +96,7 @@ public class Udong extends BaseTimeEntity {
         }
     }
 
-    public void validateParticipation(Long memberId) {
+    public void validateParticipation(Long memberId, int currentParticipantCount) {
         if (!status.isPrepare()) {
             throw new InvalidParticipationException("여행이 시작되었거나 종료된 우동에는 참여할 수 없습니다.");
         }
@@ -105,8 +105,8 @@ public class Udong extends BaseTimeEntity {
             throw new InvalidParticipationException("자신이 생성한 우동에는 참여할 수 없습니다.");
         }
 
-        if (recruitPlanner.isFull()) {
-            throw new InvalidParticipationException("모집 인원이 다 찼습니다.");
+        if (!recruitPlanner.isRecruitmentAvailable(currentParticipantCount)) {
+            throw new InvalidParticipationException("모집 인원이 이미 다 찼습니다.");
         }
     }
 }

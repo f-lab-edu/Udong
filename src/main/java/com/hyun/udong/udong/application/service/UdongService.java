@@ -93,7 +93,8 @@ public class UdongService {
         Udong udong = udongRepository.findById(udongId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
 
-        udong.validateParticipation(memberId);
+        List<Participant> participants = participantRepository.findByUdong(udong);
+        udong.validateParticipation(memberId, participants.size());
 
         if (participantRepository.existsByUdongAndMemberId(udong, memberId)) {
             throw new InvalidParticipationException("이미 참여 중인 우동입니다.");
