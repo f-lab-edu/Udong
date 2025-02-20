@@ -241,8 +241,9 @@ class UdongControllerTest {
                 UdongStatus.PREPARE));
         memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
         memberRepository.save(new Member(3L, SocialType.KAKAO, "훈이", "https://user3.com"));
-        memberRepository.save(new Member(4L, SocialType.KAKAO, "유리", "https://user4.com"));
         participantRepository.saveAll(List.of(Participant.from(2L, udong), Participant.from(3L, udong)));
+
+        memberRepository.save(new Member(4L, SocialType.KAKAO, "유리", "https://user4.com"));
 
         // when & then
         RestAssured
