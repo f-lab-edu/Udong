@@ -97,7 +97,7 @@ public class Udong extends BaseTimeEntity {
     }
 
     public void validateParticipation(Long memberId, int currentParticipantCount) {
-        if (!status.isPrepare()) {
+        if (status != UdongStatus.PREPARE) {
             throw new InvalidParticipationException("여행이 시작되었거나 종료된 우동에는 참여할 수 없습니다.");
         }
 
