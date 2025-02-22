@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -32,9 +32,10 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(DataCleanerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UdongControllerTest {
+    public static final LocalDate NOW = LocalDate.now();
 
     private Udong udong;
-    private Member member;
+    private Member owner;
     private String ownerToken;
 
     @LocalServerPort
@@ -58,15 +59,22 @@ class UdongControllerTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        member = memberRepository.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
-        udong = udongRepository.save(new Udong(member.getId(),
-                "title",
-                "description",
-                5,
-                LocalDate.now(),
-                LocalDate.now().plusDays(5),
-                UdongStatus.PREPARE));
-        ownerToken = testOauth.generateAccessToken(member.getId());
+        owner = memberRepository.save(new Member(1L, SocialType.KAKAO, "짱구", "https://user1.com"));
+        ownerToken = testOauth.generateAccessToken(owner.getId());
+
+        udong = createSingleUdong(5, NOW, NOW.plusDays(5), UdongStatus.PREPARE);
+    }
+
+    private List<Udong> createUdong(int count, int recruitmentCount, LocalDate startDate, LocalDate endDate, UdongStatus status) {
+        List<Udong> udongs = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            udongs.add(udongRepository.save(new Udong(owner.getId(), "title" + i, "description" + i, recruitmentCount, startDate, endDate, status)));
+        }
+        return udongs;
+    }
+
+    private Udong createSingleUdong(int recruitmentCount, LocalDate startDate, LocalDate endDate, UdongStatus status) {
+        return createUdong(1, recruitmentCount, startDate, endDate, status).get(0);
     }
 
     @Test
@@ -76,8 +84,8 @@ class UdongControllerTest {
                 "동행 구해요",
                 "서울과 부산 여행할 동행을 찾습니다!",
                 5,
-                LocalDate.now().plusDays(5),
-                LocalDate.now().plusDays(10),
+                NOW.plusDays(5),
+                NOW.plusDays(10),
                 List.of("여행", "맛집"));
 
         RestAssured
@@ -121,8 +129,8 @@ class UdongControllerTest {
                 "동행 구해요",
                 "서울과 부산 여행할 동행을 찾습니다!",
                 5,
-                LocalDate.now().plusDays(5),
-                LocalDate.now().plusDays(10),
+                NOW.plusDays(5),
+                NOW.plusDays(10),
                 List.of("여행", "맛집"));
 
         RestAssured
@@ -139,8 +147,9 @@ class UdongControllerTest {
     }
 
     @Test
-    @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void 검색_조건_없이_전체_우동_조회() {
+        createUdong(10, 5, NOW, NOW.plusDays(5), UdongStatus.PREPARE);
+
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
@@ -152,12 +161,13 @@ class UdongControllerTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .body("content", not(empty()))
-                .body("totalElements", equalTo(21));
+                .body("totalElements", equalTo(11)); // 기본 1개 + 10개 추가
     }
 
     @Test
-    @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void 검색_조건_없이_전체_우동_조회_페이징() {
+        createUdong(10, 5, NOW, NOW.plusDays(5), UdongStatus.PREPARE);
+
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
@@ -171,17 +181,16 @@ class UdongControllerTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .body("content", not(empty()))
-                .body("totalElements", equalTo(21))
-                .body("totalPages", equalTo(3))
+                .body("totalElements", equalTo(11)) // 기본 1개 + 10개 추가
+                .body("totalPages", equalTo(2))
                 .body("hasNextPage", equalTo(true));
     }
 
     @Test
-    @Sql(scripts = "/insert_udong_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void 특정_기간_필터링_우동_조회() {
         // given
-        LocalDate startDate = LocalDate.of(2025, 9, 1);
-        LocalDate endDate = LocalDate.of(2025, 9, 10);
+        LocalDate startDate = NOW;
+        LocalDate endDate = NOW.plusDays(5);
 
         // when & then
         RestAssured
@@ -242,16 +251,10 @@ class UdongControllerTest {
     @Test
     void 모집_인원이_다_찬_우동에_참여_요청시_실패() {
         // given
-        Udong udong = udongRepository.save(new Udong(member.getId(),
-                "title",
-                "description",
-                2,
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(5),
-                UdongStatus.PREPARE));
+        Udong fullUdong = createSingleUdong(2, NOW, NOW.plusDays(5), UdongStatus.PREPARE);
         memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
         memberRepository.save(new Member(3L, SocialType.KAKAO, "훈이", "https://user3.com"));
-        participantRepository.saveAll(List.of(Participant.from(2L, udong), Participant.from(3L, udong)));
+        participantRepository.saveAll(List.of(Participant.from(2L, fullUdong), Participant.from(3L, fullUdong)));
 
         Member requestMember = memberRepository.save(new Member(4L, SocialType.KAKAO, "유리", "https://user4.com"));
 
@@ -262,7 +265,7 @@ class UdongControllerTest {
                 .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
-                .post("/api/udongs/{udongId}/participate", udong.getId())
+                .post("/api/udongs/{udongId}/participate", fullUdong.getId())
 
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -291,14 +294,7 @@ class UdongControllerTest {
     @Test
     void 이미_시작된_우동에_참여_요청시_실패() {
         // given
-        Member owner = memberRepository.save(new Member(2L, SocialType.KAKAO, "owner", "profile"));
-        Udong udong = udongRepository.save(new Udong(owner.getId(),
-                "title",
-                "description",
-                5,
-                LocalDate.now(),
-                LocalDate.now().plusDays(5),
-                UdongStatus.IN_PROGRESS));
+        Udong inProgressUdong = createSingleUdong(2, NOW, NOW.plusDays(5), UdongStatus.IN_PROGRESS);
         Member requestMember = memberRepository.save(new Member(2L, SocialType.KAKAO, "맹구", "https://user2.com"));
 
         // when & then
@@ -308,7 +304,7 @@ class UdongControllerTest {
                 .header("Authorization", testOauth.generateAccessToken(requestMember.getId()))
 
                 .when()
-                .post("/api/udongs/{udongId}/participate", udong.getId())
+                .post("/api/udongs/{udongId}/participate", inProgressUdong.getId())
 
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
