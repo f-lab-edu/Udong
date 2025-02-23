@@ -6,8 +6,10 @@ import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.udong.application.service.UdongService;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
+import com.hyun.udong.udong.presentation.dto.response.ApprovedParticipantResponse;
 import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
 import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.WaitingMemberResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,5 +34,27 @@ public class UdongController {
                                                         Pageable pageable,
                                                         @LoginMember Member member) {
         return udongService.findUdongs(request, pageable);
+    }
+
+    @PostMapping("/{udongId}/participate")
+    public ResponseEntity<WaitingMemberResponse> participantUdong(@PathVariable("udongId") Long udongId,
+                                                                  @LoginMember Member member) {
+        return ResponseEntity.ok(udongService.requestParticipation(udongId, member.getId()));
+    }
+
+    @PostMapping("/{udongId}/approve/{waitingMemberId}")
+    public ResponseEntity<ApprovedParticipantResponse> approveParticipant(@PathVariable("udongId") Long udongId,
+                                                                          @PathVariable("waitingMemberId") Long waitingMemberId,
+                                                                          @LoginMember Member member) {
+        ApprovedParticipantResponse response = udongService.approveParticipant(udongId, waitingMemberId, member.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{udongId}/reject/{waitingMemberId}")
+    public ResponseEntity<Void> rejectParticipant(@PathVariable("udongId") Long udongId,
+                                                  @PathVariable("waitingMemberId") Long waitingMemberId,
+                                                  @LoginMember Member member) {
+        udongService.rejectParticipant(udongId, waitingMemberId, member.getId());
+        return ResponseEntity.noContent().build();
     }
 }

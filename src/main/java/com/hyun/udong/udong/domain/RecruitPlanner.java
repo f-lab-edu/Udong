@@ -32,4 +32,7 @@ public class RecruitPlanner {
         return new RecruitPlanner(recruitmentCount);
     }
 
+    public boolean isRecruitmentAvailable(int currentParticipantCount) {
+        return currentParticipantCount < recruitmentCount;
+    }
 }

@@ -7,13 +7,13 @@ import com.hyun.udong.member.infrastructure.repository.MemberRepository;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
 import com.hyun.udong.udong.domain.*;
-import com.hyun.udong.udong.infrastructure.repository.ParticipantRepository;
+import com.hyun.udong.udong.exception.InvalidParticipationException;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
+import com.hyun.udong.udong.infrastructure.repository.participant.ParticipantRepository;
+import com.hyun.udong.udong.infrastructure.repository.waitingmember.WaitingMemberRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
-import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
-import com.hyun.udong.udong.presentation.dto.response.ParticipantCountResponse;
-import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ public class UdongService {
     private final CityRepository cityRepository;
     private final UdongRepository udongRepository;
     private final ParticipantRepository participantRepository;
+    private final WaitingMemberRepository waitingMemberRepository;
 
     @Transactional
     public CreateUdongResponse createUdong(CreateUdongRequest request, Long memberId) {
@@ -57,11 +60,43 @@ public class UdongService {
     }
 
     public PagedResponse<SimpleUdongResponse> findUdongs(FindUdongsCondition request, Pageable pageable) {
-        Page<Udong> udongPage = udongRepository.findByFilter(request, pageable);
-        List<ParticipantCountResponse> participantCounts = getParticipantCounts(udongPage.getContent());
+        Page<Udong> udongs = udongRepository.findByFilter(request, pageable);
+        List<ParticipantCountResponse> counts = getParticipantCounts(udongs.getContent());
+        List<SimpleUdongResponse> responses = mapToResponses(udongs.getContent(), counts);
+        return PagedResponse.of(new PageImpl<>(responses, pageable, udongs.getTotalElements()));
+    }
 
-        List<SimpleUdongResponse> udongResponses = convertToResponse(udongPage.getContent(), participantCounts);
-        return PagedResponse.of(new PageImpl<>(udongResponses, pageable, udongPage.getTotalElements()));
+    @Transactional
+    public WaitingMemberResponse requestParticipation(Long udongId, Long memberId) {
+        Udong udong = findUdongById(udongId);
+
+        validateParticipationRequest(memberId, udong);
+
+        WaitingMember waitingMember = WaitingMember.builder()
+                .udong(udong)
+                .memberId(memberId)
+                .build();
+        return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
+    }
+
+    @Transactional
+    public ApprovedParticipantResponse approveParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
+        Udong udong = findUdongById(udongId);
+        udong.validateOwner(ownerId);
+
+        WaitingMember waitingMember = findWaitingMember(waitingMemberId, udong);
+        waitingMemberRepository.delete(waitingMember);
+
+        return ApprovedParticipantResponse.of(participantRepository.save(Participant.from(waitingMember.getMemberId(), udong)));
+    }
+
+    @Transactional
+    public void rejectParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
+        Udong udong = findUdongById(udongId);
+        udong.validateOwner(ownerId);
+
+        WaitingMember waitingMember = findWaitingMember(waitingMemberId, udong);
+        waitingMemberRepository.delete(waitingMember);
     }
 
     private List<ParticipantCountResponse> getParticipantCounts(List<Udong> udongs) {
@@ -72,16 +107,38 @@ public class UdongService {
         return participantRepository.countParticipantsByUdongIds(udongIds);
     }
 
-    private static List<SimpleUdongResponse> convertToResponse(List<Udong> udongs, List<ParticipantCountResponse> participantCounts) {
+    private List<SimpleUdongResponse> mapToResponses(List<Udong> udongs, List<ParticipantCountResponse> counts) {
+        Map<Long, Integer> udongIdToCount = counts.stream()
+                .collect(Collectors.toMap(ParticipantCountResponse::udongId, count -> count.participantCount().intValue()));
+
         return udongs.stream()
-                .map(udong -> {
-                    int count = participantCounts.stream()
-                            .filter(participant -> participant.udongId().equals(udong.getId()))
-                            .findFirst()
-                            .map(ParticipantCountResponse::participantCount)
-                            .orElse(0L).intValue();
-                    return SimpleUdongResponse.from(udong, count);
-                })
+                .map(udong -> SimpleUdongResponse.from(udong, udongIdToCount.getOrDefault(udong.getId(), 0)))
                 .toList();
+    }
+
+    private void validateParticipationRequest(Long memberId, Udong udong) {
+        List<Participant> participants = participantRepository.findByUdong(udong);
+        boolean alreadyParticipated = participants.stream()
+                .anyMatch(participant -> participant.getMemberId().equals(memberId));
+
+        if (alreadyParticipated) {
+            throw new InvalidParticipationException("이미 참여 중인 우동입니다.");
+        }
+
+        if (waitingMemberRepository.existsByUdongAndMemberId(udong, memberId)) {
+            throw new InvalidParticipationException("이미 요청을 보낸 우동입니다.");
+        }
+
+        udong.validateParticipation(memberId, participants.size());
+    }
+
+    private Udong findUdongById(Long udongId) {
+        return udongRepository.findById(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+    }
+
+    private WaitingMember findWaitingMember(Long waitingMemberId, Udong udong) {
+        return waitingMemberRepository.findByUdongAndMemberId(udong, waitingMemberId)
+                .orElseThrow(() -> new NotFoundException("해당 대기자를 찾을 수 없습니다."));
     }
 }
