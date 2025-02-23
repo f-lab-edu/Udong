@@ -268,7 +268,8 @@ class UdongServiceTest {
         udongService.approveParticipant(udong.getId(), requestMember.getId(), udong.getOwnerId());
 
         // then
-        boolean isParticipant = participantRepository.existsByUdongAndMemberId(udong, requestMember.getId());
+        boolean isParticipant = participantRepository.findByUdong(udong).stream()
+                .anyMatch(participant -> participant.getMemberId().equals(requestMember.getId()));
         assertThat(isParticipant).isTrue();
     }
 

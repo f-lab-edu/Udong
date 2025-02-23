@@ -225,7 +225,10 @@ class UdongControllerTest {
                 .post("/api/udongs/{udongId}/participate", udong.getId())
 
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("udongId", equalTo(udong.getId().intValue()))
+                .body("memberId", equalTo(requestMember.getId().intValue()))
+                .body("requestDate", equalTo(NOW.toString()));
     }
 
     @Test
@@ -330,7 +333,10 @@ class UdongControllerTest {
                 .post("/api/udongs/{udongId}/approve/{waitingMemberId}", udong.getId(), waitingMember.getId())
 
                 .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("udongId", equalTo(udong.getId().intValue()))
+                .body("memberId", equalTo(waitingMember.getId().intValue()))
+                .body("participationDate", equalTo(NOW.toString()));
     }
 
     @Test
