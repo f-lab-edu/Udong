@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -107,17 +109,12 @@ public class UdongService {
     }
 
     private List<SimpleUdongResponse> mapToResponses(List<Udong> udongs, List<ParticipantCountResponse> counts) {
-        return udongs.stream()
-                .map(udong -> SimpleUdongResponse.from(udong, getCount(udong, counts)))
-                .toList();
-    }
+        Map<Long, Integer> udongIdToCount = counts.stream()
+                .collect(Collectors.toMap(ParticipantCountResponse::udongId, count -> count.participantCount().intValue()));
 
-    private int getCount(Udong udong, List<ParticipantCountResponse> counts) {
-        return counts.stream()
-                .filter(count -> count.udongId().equals(udong.getId()))
-                .findFirst()
-                .map(count -> count.participantCount().intValue())
-                .orElse(0);
+        return udongs.stream()
+                .map(udong -> SimpleUdongResponse.from(udong, udongIdToCount.getOrDefault(udong.getId(), 0)))
+                .toList();
     }
 
     private void validateParticipationRequest(Long memberId, Udong udong) {
