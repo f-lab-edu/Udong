@@ -13,9 +13,7 @@ import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.infrastructure.repository.WaitingMemberRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
-import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
-import com.hyun.udong.udong.presentation.dto.response.ParticipantCountResponse;
-import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -69,7 +67,7 @@ public class UdongService {
     }
 
     @Transactional
-    public void requestParticipation(Long udongId, Long memberId) {
+    public WaitingMemberResponse requestParticipation(Long udongId, Long memberId) {
         Udong udong = findUdongById(udongId);
 
         validateParticipationRequest(memberId, udong);
@@ -78,17 +76,18 @@ public class UdongService {
                 .udong(udong)
                 .memberId(memberId)
                 .build();
-        waitingMemberRepository.save(waitingMember);
+        return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
     }
 
     @Transactional
-    public void approveParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
+    public ApprovedParticipantResponse approveParticipant(Long udongId, Long waitingMemberId, Long ownerId) {
         Udong udong = findUdongById(udongId);
         udong.validateOwner(ownerId);
 
         WaitingMember waitingMember = findWaitingMember(waitingMemberId, udong);
         waitingMemberRepository.delete(waitingMember);
-        participantRepository.save(Participant.from(waitingMember.getMemberId(), udong));
+
+        return ApprovedParticipantResponse.of(participantRepository.save(Participant.from(waitingMember.getMemberId(), udong)));
     }
 
     @Transactional
@@ -119,15 +118,18 @@ public class UdongService {
 
     private void validateParticipationRequest(Long memberId, Udong udong) {
         List<Participant> participants = participantRepository.findByUdong(udong);
-        udong.validateParticipation(memberId, participants.size());
+        boolean alreadyParticipated = participants.stream()
+                .anyMatch(participant -> participant.getMemberId().equals(memberId));
 
-        if (participantRepository.existsByUdongAndMemberId(udong, memberId)) {
+        if (alreadyParticipated) {
             throw new InvalidParticipationException("이미 참여 중인 우동입니다.");
         }
 
         if (waitingMemberRepository.existsByUdongAndMemberId(udong, memberId)) {
             throw new InvalidParticipationException("이미 요청을 보낸 우동입니다.");
         }
+
+        udong.validateParticipation(memberId, participants.size());
     }
 
     private Udong findUdongById(Long udongId) {
