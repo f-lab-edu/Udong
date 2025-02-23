@@ -1,9 +1,10 @@
-package com.hyun.udong.udong.infrastructure.repository;
+package com.hyun.udong.udong.infrastructure.repository.participant;
 
 import com.hyun.udong.common.config.QueryDslConfig;
 import com.hyun.udong.common.fixture.TestFixture;
 import com.hyun.udong.udong.domain.Participant;
 import com.hyun.udong.udong.domain.Udong;
+import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.presentation.dto.response.ParticipantCountResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

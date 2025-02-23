@@ -1,4 +1,4 @@
-package com.hyun.udong.udong.infrastructure.repository;
+package com.hyun.udong.udong.infrastructure.repository.waitingmember;
 
 import com.hyun.udong.udong.domain.Udong;
 import com.hyun.udong.udong.domain.WaitingMember;

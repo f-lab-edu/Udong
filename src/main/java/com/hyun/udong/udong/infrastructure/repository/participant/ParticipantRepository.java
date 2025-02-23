@@ -1,4 +1,4 @@
-package com.hyun.udong.udong.infrastructure.repository;
+package com.hyun.udong.udong.infrastructure.repository.participant;
 
 import com.hyun.udong.udong.domain.Participant;
 import com.hyun.udong.udong.domain.Udong;
