@@ -1,5 +1,6 @@
 package com.hyun.udong.udong.domain;
 
+import com.hyun.udong.udong.exception.InvalidParticipationException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,8 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class WaitingMember {
+
+    private static final int MAX_WAITING_COUNT = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,5 +37,19 @@ public class WaitingMember {
         this.udong = udong;
         this.memberId = memberId;
         this.requestDate = LocalDate.now();
+    }
+
+    public static WaitingMember of(Udong udong, Long memberId, int currentWaitingMembersCount) {
+        validateWaitingCount(currentWaitingMembersCount);
+        return WaitingMember.builder()
+                .udong(udong)
+                .memberId(memberId)
+                .build();
+    }
+
+    private static void validateWaitingCount(int currentWaitingMembersCount) {
+        if (currentWaitingMembersCount >= MAX_WAITING_COUNT) {
+            throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
+        }
     }
 }

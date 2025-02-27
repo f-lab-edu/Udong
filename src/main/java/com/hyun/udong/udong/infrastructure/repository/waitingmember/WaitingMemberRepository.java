@@ -10,4 +10,7 @@ public interface WaitingMemberRepository extends JpaRepository<WaitingMember, Lo
     boolean existsByUdongAndMemberId(Udong udong, Long memberId);
 
     Optional<WaitingMember> findByUdongAndMemberId(Udong udong, Long memberId);
+
+    int countByUdong(Udong udong);
+
 }

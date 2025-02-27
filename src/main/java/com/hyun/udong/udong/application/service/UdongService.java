@@ -72,10 +72,7 @@ public class UdongService {
 
         validateParticipationRequest(memberId, udong);
 
-        WaitingMember waitingMember = WaitingMember.builder()
-                .udong(udong)
-                .memberId(memberId)
-                .build();
+        WaitingMember waitingMember = WaitingMember.of(udong, memberId, waitingMemberRepository.countByUdong(udong));
         return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
     }
 
