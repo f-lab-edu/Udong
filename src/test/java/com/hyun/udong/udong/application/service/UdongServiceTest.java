@@ -221,6 +221,22 @@ class UdongServiceTest {
                 .hasMessage("존재하지 않는 우동입니다.");
     }
 
+
+    @Test
+    void 대기자_인원이_초과된_우동에_동행_요청을_보내면_예외가_발생한다() {
+        // given
+        for (int i = 0; i < 5; i++) {
+            Member member = memberRepository.save(new Member((long) i, SocialType.KAKAO, "member" + i, "profile_image"));
+            waitingMemberRepository.save(WaitingMember.of(udong, member.getId(), waitingMemberRepository.countByUdong(udong)));
+        }
+        Member requestMember = memberRepository.save(new Member(7L, SocialType.KAKAO, "gildong", "profile_image"));
+
+        // when & hen
+        assertThatThrownBy(() -> udongService.requestParticipation(udong.getId(), requestMember.getId()))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("대기 인원이 초과되었습니다.");
+    }
+
     @Test
     void 존재하지_않는_우동에_대기자_승인을_하면_예외가_발생한다() {
         // given
