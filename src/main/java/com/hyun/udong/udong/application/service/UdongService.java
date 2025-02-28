@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +79,11 @@ public class UdongService {
         return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
     }
 
+    @Retryable(
+            retryFor = ObjectOptimisticLockingFailureException.class,
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 50)
+    )
     @Transactional
     public WaitingMemberResponse requestParticipationWithLock(Long udongId, Long memberId) {
         Udong udong = udongRepository.findUdongByWithOptimisticLock(udongId);

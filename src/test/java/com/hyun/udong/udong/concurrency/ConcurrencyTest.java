@@ -2,7 +2,6 @@ package com.hyun.udong.udong.concurrency;
 
 import com.hyun.udong.udong.application.service.UdongService;
 import com.hyun.udong.udong.domain.*;
-import com.hyun.udong.udong.facade.OptimisticLockParticipationFacade;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.infrastructure.repository.waitingmember.WaitingMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +30,6 @@ class ConcurrencyTest {
 
     @Autowired
     private UdongRepository udongRepository;
-
-    @Autowired
-    private OptimisticLockParticipationFacade optimisticLockParticipationFacade;
 
     @BeforeEach
     void setUp() {
@@ -99,9 +95,7 @@ class ConcurrencyTest {
             long memberId = startMemberId + i;
             executorService.submit(() -> {
                 try {
-                    optimisticLockParticipationFacade.requestParticipation(udong.getId(), memberId);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    udongService.requestParticipationWithLock(udong.getId(), memberId);
                 } finally {
                     latch.countDown();
                 }
