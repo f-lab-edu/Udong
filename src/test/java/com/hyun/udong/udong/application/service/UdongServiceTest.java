@@ -227,7 +227,7 @@ class UdongServiceTest {
         // given
         for (int i = 0; i < 5; i++) {
             Member member = memberRepository.save(new Member((long) i, SocialType.KAKAO, "member" + i, "profile_image"));
-            waitingMemberRepository.save(WaitingMember.of(udong, member.getId(), waitingMemberRepository.countByUdong(udong)));
+            waitingMemberRepository.save(WaitingMember.of(udong, member.getId()));
         }
         Member requestMember = memberRepository.save(new Member(7L, SocialType.KAKAO, "gildong", "profile_image"));
 
