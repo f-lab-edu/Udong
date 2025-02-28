@@ -109,4 +109,33 @@ class ConcurrencyTest {
         int waitingCount = waitingMemberRepository.countByUdong(udong);
         assertThat(waitingCount).isEqualTo(5);
     }
+
+    @Test
+    void 대기자_리스트_초과_동시성_테스트_비관적락() throws InterruptedException {
+        System.out.println(">>>>>>>>>>>> ConcurrencyTest.대기자_리스트_초과_동시성_테스트_비관적락");
+        // given
+        final int REQUEST_MEMBER_COUNT = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
+        CountDownLatch latch = new CountDownLatch(REQUEST_MEMBER_COUNT);
+
+        // when
+        long startMemberId = 5L;
+        for (int i = 0; i < REQUEST_MEMBER_COUNT; i++) {
+            long memberId = startMemberId + i;
+            executorService.submit(() -> {
+                try {
+                    udongService.requestParticipationWithPessimisticLock(udong.getId(), memberId);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await(); // 스레드 완료될 때까지 대기
+        executorService.shutdown();
+
+        // then
+        int waitingCount = waitingMemberRepository.countByUdong(udong);
+        assertThat(waitingCount).isEqualTo(5);
+    }
 }
