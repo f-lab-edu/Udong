@@ -72,8 +72,20 @@ public class UdongService {
 
         validateParticipationRequest(memberId, udong);
 
-        WaitingMember waitingMember = WaitingMember.of(udong, memberId, waitingMemberRepository.countByUdong(udong));
+        WaitingMember waitingMember = WaitingMember.of(udong, memberId);
         return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
+    }
+
+    @Transactional
+    public WaitingMemberResponse requestParticipationWithLock(Long udongId, Long memberId) {
+        Udong udong = udongRepository.findUdongByWithOptimisticLock(udongId);
+        validateParticipationRequest(memberId, udong);
+
+        WaitingMember waitingMember = WaitingMember.of(udong, memberId);
+        WaitingMember saved = waitingMemberRepository.save(waitingMember);
+
+        udong.increaseWaitingMemberCount();
+        return WaitingMemberResponse.of(saved);
     }
 
     @Transactional

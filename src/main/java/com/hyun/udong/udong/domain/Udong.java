@@ -5,10 +5,7 @@ import com.hyun.udong.common.exception.InvalidParameterException;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.udong.exception.InvalidParticipationException;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,6 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Udong extends BaseTimeEntity {
+    private static final int MAX_WAITING_COUNT = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +44,13 @@ public class Udong extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
+
+    @Setter
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int currentWaitingMemberCount;
+
+    @Version
+    private Long version;
 
     public Udong(Long ownerId,
                  String title,
@@ -118,5 +123,22 @@ public class Udong extends BaseTimeEntity {
 
     public boolean isOwner(Long memberId) {
         return this.ownerId.equals(memberId);
+    }
+
+    public void increaseWaitingMemberCount() {
+        if (this.currentWaitingMemberCount >= MAX_WAITING_COUNT) {
+            throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
+        }
+        this.currentWaitingMemberCount++;
+    }
+
+    @Override
+    public String toString() {
+        return "Udong{" +
+                "id=" + id +
+                ", ownerId=" + ownerId +
+                ", currentWaitingMemberCount=" + currentWaitingMemberCount +
+                ", version=" + version +
+                '}';
     }
 }

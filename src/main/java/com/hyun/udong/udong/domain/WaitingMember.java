@@ -39,8 +39,8 @@ public class WaitingMember {
         this.requestDate = LocalDate.now();
     }
 
-    public static WaitingMember of(Udong udong, Long memberId, int currentWaitingMembersCount) {
-        validateWaitingCount(currentWaitingMembersCount);
+    public static WaitingMember of(Udong udong, Long memberId) {
+        validateWaitingCount(udong.getCurrentWaitingMemberCount());
         return WaitingMember.builder()
                 .udong(udong)
                 .memberId(memberId)
@@ -51,5 +51,13 @@ public class WaitingMember {
         if (currentWaitingMembersCount >= MAX_WAITING_COUNT) {
             throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
         }
+    }
+
+    @Override
+    public String toString() {
+        return "WaitingMember{" +
+                ", udong=" + udong.getId() +
+                ", memberId=" + memberId +
+                '}';
     }
 }
