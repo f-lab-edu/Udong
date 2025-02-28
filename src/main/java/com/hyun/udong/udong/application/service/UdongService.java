@@ -85,7 +85,7 @@ public class UdongService {
             backoff = @Backoff(delay = 50)
     )
     @Transactional
-    public WaitingMemberResponse requestParticipationWithLock(Long udongId, Long memberId) {
+    public WaitingMemberResponse requestParticipationWithOptimisticLock(Long udongId, Long memberId) {
         Udong udong = udongRepository.findUdongByWithOptimisticLock(udongId);
         validateParticipationRequest(memberId, udong);
 

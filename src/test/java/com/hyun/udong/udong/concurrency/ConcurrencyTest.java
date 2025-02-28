@@ -95,7 +95,7 @@ class ConcurrencyTest {
             long memberId = startMemberId + i;
             executorService.submit(() -> {
                 try {
-                    udongService.requestParticipationWithLock(udong.getId(), memberId);
+                    udongService.requestParticipationWithOptimisticLock(udong.getId(), memberId);
                 } finally {
                     latch.countDown();
                 }
