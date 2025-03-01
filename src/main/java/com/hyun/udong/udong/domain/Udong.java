@@ -5,7 +5,10 @@ import com.hyun.udong.common.exception.InvalidParameterException;
 import com.hyun.udong.travelschedule.domain.City;
 import com.hyun.udong.udong.exception.InvalidParticipationException;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,7 +48,6 @@ public class Udong extends BaseTimeEntity {
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
 
-    @Setter
     @Column(nullable = false, columnDefinition = "int default 0")
     private int currentWaitingMemberCount;
 

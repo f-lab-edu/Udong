@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +41,7 @@ class ConcurrencyTest {
     private UdongRepository udongRepository;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchFieldException, IllegalAccessException {
         udong = Udong.builder()
                 .content(Content.of("여행 동행 모집", "즐겁게 여행할 동행을 구합니다."))
                 .recruitPlanner(RecruitPlanner.from(5))
@@ -53,7 +54,10 @@ class ConcurrencyTest {
         for (int i = 0; i < 4; i++) {
             waitingMemberRepository.save(WaitingMember.of(udong, (long) i));
         }
-        udong.setCurrentWaitingMemberCount(4);
+        // 동시성 테스트를 위해 현재 대기자 수를 4로 세팅
+        Field currentWaitingMemberCount = Udong.class.getDeclaredField("currentWaitingMemberCount");
+        currentWaitingMemberCount.setAccessible(true);
+        currentWaitingMemberCount.set(udong, 4);
         udongRepository.save(udong);
     }
 
