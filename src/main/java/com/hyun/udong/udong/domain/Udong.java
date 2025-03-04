@@ -130,13 +130,6 @@ public class Udong extends BaseTimeEntity {
         return this.ownerId.equals(memberId);
     }
 
-    public void increaseWaitingMemberCount() {
-        if (this.currentWaitingMemberCount >= MAX_WAITING_COUNT) {
-            throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
-        }
-        this.currentWaitingMemberCount++;
-    }
-
     public WaitingMember addWaitingMember(Long memberId) {
         if (this.waitingMembers.size() >= MAX_WAITING_COUNT) {
             throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
