@@ -1,11 +1,13 @@
 package com.hyun.udong.udong.concurrency;
 
+import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.udong.application.service.UdongService;
 import com.hyun.udong.udong.domain.*;
 import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.infrastructure.repository.waitingmember.WaitingMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,6 +22,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(DataCleanerExtension.class)
 @SpringBootTest
 class ConcurrencyTest {
 
