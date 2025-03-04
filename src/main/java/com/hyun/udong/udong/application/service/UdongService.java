@@ -91,9 +91,7 @@ public class UdongService {
 
         validateParticipationRequest(memberId, udong);
 
-        WaitingMember waitingMember = waitingMemberRepository.save(WaitingMember.of(udong, memberId));
-
-        udong.increaseWaitingMemberCount();
+        WaitingMember waitingMember = udong.addWaitingMember(memberId);
         return WaitingMemberResponse.of(waitingMember);
     }
 
@@ -104,9 +102,8 @@ public class UdongService {
 
         validateParticipationRequest(memberId, udong);
 
-        WaitingMember waitingMember = waitingMemberRepository.save(WaitingMember.of(udong, memberId));
-        
-        udong.increaseWaitingMemberCount();
+        WaitingMember waitingMember = udong.addWaitingMember(memberId);
+
         return WaitingMemberResponse.of(waitingMember);
     }
 
