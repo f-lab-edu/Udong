@@ -92,6 +92,10 @@ public class Udong extends BaseTimeEntity {
         }
     }
 
+    Udong(Long memberId) {
+        this.ownerId = memberId;
+    }
+
     public void addCities(List<City> cities) {
         cities.forEach(this::addCity);
     }
@@ -134,6 +138,13 @@ public class Udong extends BaseTimeEntity {
         if (this.waitingMembers.size() >= MAX_WAITING_COUNT) {
             throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
         }
+        WaitingMember waitingMember = WaitingMember.of(this, memberId);
+        this.waitingMembers.add(waitingMember);
+        currentWaitingMemberCount = this.waitingMembers.size();
+        return waitingMember;
+    }
+
+    public WaitingMember addWaitingMember(Long memberId) {
         WaitingMember waitingMember = WaitingMember.of(this, memberId);
         this.waitingMembers.add(waitingMember);
         currentWaitingMemberCount = this.waitingMembers.size();
