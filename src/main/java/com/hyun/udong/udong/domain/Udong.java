@@ -144,13 +144,6 @@ public class Udong extends BaseTimeEntity {
         return waitingMember;
     }
 
-    public WaitingMember addWaitingMember(Long memberId) {
-        WaitingMember waitingMember = WaitingMember.of(this, memberId);
-        this.waitingMembers.add(waitingMember);
-        currentWaitingMemberCount = this.waitingMembers.size();
-        return waitingMember;
-    }
-
     @Override
     public String toString() {
         return "Udong{" +
