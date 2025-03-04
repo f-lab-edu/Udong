@@ -48,6 +48,9 @@ public class Udong extends BaseTimeEntity {
     @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelCity> travelCities = new ArrayList<>();
 
+    @OneToMany(mappedBy = "udong", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WaitingMember> waitingMembers;
+
     @Column(nullable = false, columnDefinition = "int default 0")
     private int currentWaitingMemberCount;
 
@@ -132,6 +135,16 @@ public class Udong extends BaseTimeEntity {
             throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
         }
         this.currentWaitingMemberCount++;
+    }
+
+    public WaitingMember addWaitingMember(Long memberId) {
+        if (this.waitingMembers.size() >= MAX_WAITING_COUNT) {
+            throw new InvalidParticipationException("대기 인원이 초과되었습니다.");
+        }
+        WaitingMember waitingMember = WaitingMember.of(this, memberId);
+        this.waitingMembers.add(waitingMember);
+        currentWaitingMemberCount = this.waitingMembers.size();
+        return waitingMember;
     }
 
     @Override
