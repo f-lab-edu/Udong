@@ -69,41 +69,19 @@ public class UdongService {
         return PagedResponse.of(new PageImpl<>(responses, pageable, udongs.getTotalElements()));
     }
 
-    @Transactional
-    public WaitingMemberResponse requestParticipation(Long udongId, Long memberId) {
-        Udong udong = findUdongById(udongId);
-
-        validateParticipationRequest(memberId, udong);
-
-        WaitingMember waitingMember = udong.addWaitingMember(memberId);
-        return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
-    }
-
     @Retryable(
             retryFor = ObjectOptimisticLockingFailureException.class,
             maxAttempts = 5,
             backoff = @Backoff(delay = 50)
     )
     @Transactional
-    public WaitingMemberResponse requestParticipationWithOptimisticLock(Long udongId, Long memberId) {
+    public WaitingMemberResponse requestParticipation(Long udongId, Long memberId) {
         Udong udong = udongRepository.findUdongByWithOptimisticLock(udongId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
 
         validateParticipationRequest(memberId, udong);
 
         WaitingMember waitingMember = udong.addWaitingMember(memberId);
-        return WaitingMemberResponse.of(waitingMember);
-    }
-
-    @Transactional
-    public WaitingMemberResponse requestParticipationWithPessimisticLock(Long udongId, Long memberId) {
-        Udong udong = udongRepository.findUdongByWithPessimisticLock(udongId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
-
-        validateParticipationRequest(memberId, udong);
-
-        WaitingMember waitingMember = udong.addWaitingMember(memberId);
-
         return WaitingMemberResponse.of(waitingMember);
     }
 

@@ -14,8 +14,4 @@ public interface UdongRepository extends JpaRepository<Udong, Long>, UdongReposi
     @Lock(LockModeType.OPTIMISTIC)
     @Query("select u from Udong u where u.id = :udongId")
     Optional<Udong> findUdongByWithOptimisticLock(@Param("udongId") Long udongId);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select u from Udong u where u.id = :udongId")
-    Optional<Udong> findUdongByWithPessimisticLock(@Param("udongId") Long udongId);
 }
