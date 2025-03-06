@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,17 +69,20 @@ public class UdongService {
         return PagedResponse.of(new PageImpl<>(responses, pageable, udongs.getTotalElements()));
     }
 
+    @Retryable(
+            retryFor = ObjectOptimisticLockingFailureException.class,
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 50)
+    )
     @Transactional
     public WaitingMemberResponse requestParticipation(Long udongId, Long memberId) {
-        Udong udong = findUdongById(udongId);
+        Udong udong = udongRepository.findUdongByWithOptimisticLock(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
 
         validateParticipationRequest(memberId, udong);
 
-        WaitingMember waitingMember = WaitingMember.builder()
-                .udong(udong)
-                .memberId(memberId)
-                .build();
-        return WaitingMemberResponse.of(waitingMemberRepository.save(waitingMember));
+        WaitingMember waitingMember = udong.addWaitingMember(memberId);
+        return WaitingMemberResponse.of(waitingMember);
     }
 
     @Transactional

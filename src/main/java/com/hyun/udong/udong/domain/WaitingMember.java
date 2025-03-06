@@ -35,4 +35,19 @@ public class WaitingMember {
         this.memberId = memberId;
         this.requestDate = LocalDate.now();
     }
+
+    public static WaitingMember of(Udong udong, Long memberId) {
+        return WaitingMember.builder()
+                .udong(udong)
+                .memberId(memberId)
+                .build();
+    }
+
+    @Override
+    public String toString() {
+        return "WaitingMember{" +
+                ", udong=" + udong.getId() +
+                ", memberId=" + memberId +
+                '}';
+    }
 }
