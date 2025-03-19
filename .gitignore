@@ -9,6 +9,7 @@ HELP.md
 # Gradle 관련
 .gradle/
 build/
+bin/
 
 # IntelliJ IDEA 설정
 .idea/
@@ -27,7 +28,9 @@ Thumbs.db
 *.swo
 
 # H2 Database 파일 (로컬 개발에서 사용하는 경우)
-# *.h2.db
+*.h2.db
+*.mv.db
+*.trace.db
 
 # PostgreSQL 관련 (로컬 개발 데이터 디렉토리)
 pgdata/
@@ -49,3 +52,7 @@ out/
 
 # queryDSL 관련
 generated
+
+# Cursor
+.vscode/
+.cursor/
