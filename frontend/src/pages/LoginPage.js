@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
@@ -6,9 +6,14 @@ import kakaoLogo from "../assets/kakao_logo.svg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // 카카오 로그인 처리
   const handleKakaoLogin = () => {
+    // 중복 클릭 방지
+    if (isLoggingIn) return;
+
+    setIsLoggingIn(true);
     // 카카오 인증 서버로 리다이렉트
     // 백엔드의 AuthController에 정의된 엔드포인트를 사용
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_KAKAO_REDIRECT_URI}&response_type=code`;
