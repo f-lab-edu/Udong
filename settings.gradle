@@ -1,1 +1,2 @@
-rootProject.name = 'udong'
+rootProject.name = 'Udong'
+include 'backend', 'frontend'

@@ -38,6 +38,7 @@ pgdata/
 # Spring Boot 관련
 application-*.properties
 application-*.yml
+.env
 .env.local
 .env.prod
 
