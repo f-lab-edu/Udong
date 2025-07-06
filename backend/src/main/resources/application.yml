@@ -5,10 +5,10 @@ spring:
   config:
     import: optional:file:.env[.properties],optional:file:.env.${spring.profiles.active}[.properties]
 
-  datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
+  # datasource:
+  #   url: ${DATASOURCE_URL}
+  #   username: ${DATASOURCE_USERNAME}
+  #   password: ${DATASOURCE_PASSWORD}
 
   application:
     name: udong

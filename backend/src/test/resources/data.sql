@@ -24,7 +24,8 @@ VALUES (1, 'South Korea', 'KR'),
        (22, 'Egypt', 'EG'),
        (23, 'Saudi Arabia', 'SA'),
        (24, 'Vietnam', 'VN'),
-       (25, 'Malaysia', 'MY');
+       (25, 'Malaysia', 'MY')
+ON CONFLICT DO NOTHING;
 
 -- 도시 데이터 삽입
 INSERT INTO city (city_id, name, country_id)
@@ -78,4 +79,5 @@ VALUES (1, 'Seoul', 1),
        (48, 'Hanoi', 24),
        (49, 'Ho Chi Minh City', 24),
        (50, 'Kuala Lumpur', 25),
-       (51, 'Penang', 25);
+       (51, 'Penang', 25)
+ON CONFLICT DO NOTHING;
