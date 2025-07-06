@@ -34,4 +34,6 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.retry:spring-retry'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }

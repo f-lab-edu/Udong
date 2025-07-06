@@ -4,10 +4,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1024M
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1024M
     build:
       context: .
@@ -29,10 +29,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1024M
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1024M
     ports:
       - "5433:5432"
@@ -57,5 +57,14 @@ services:
     depends_on:
       - postgres
 
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:

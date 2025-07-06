@@ -31,3 +31,15 @@ logs-k6:
 
 restart-spring:
 	docker compose -f $(PROJECT_COMPOSE) restart spring
+
+start-redis:
+	docker compose -f $(PROJECT_COMPOSE) up -d redis
+
+stop-redis:
+	docker compose -f $(PROJECT_COMPOSE) stop redis
+
+logs-redis:
+	docker compose -f $(PROJECT_COMPOSE) logs -f redis
+
+restart-redis:
+	docker compose -f $(PROJECT_COMPOSE) restart redis
