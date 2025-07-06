@@ -1,15 +1,10 @@
 package com.hyun.udong.auth.presentation.controller;
 
-import com.hyun.udong.auth.infrastructure.client.KakaoOAuthClient;
-import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
-import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
-import com.hyun.udong.auth.util.JwtTokenProvider;
-import com.hyun.udong.common.util.DataCleanerExtension;
-import com.hyun.udong.member.application.service.MemberService;
-import com.hyun.udong.member.domain.Member;
-import com.hyun.udong.member.domain.SocialType;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +13,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
+import com.hyun.udong.auth.infrastructure.client.KakaoOAuthClient;
+import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
+import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
+import com.hyun.udong.auth.util.JwtTokenProvider;
+import com.hyun.udong.common.util.DataCleanerExtension;
+import com.hyun.udong.member.application.service.MemberService;
+import com.hyun.udong.member.domain.Member;
+import com.hyun.udong.member.domain.SocialType;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 
 @ExtendWith(DataCleanerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -74,9 +76,6 @@ class AuthControllerTest {
         // given
         Member member = memberService.save(new Member(100L, SocialType.KAKAO, "hyun", "profile_image"));
         String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
-
-        member.updateRefreshToken(refreshToken);
-        memberService.save(member);
 
         // when & then
         RestAssured
