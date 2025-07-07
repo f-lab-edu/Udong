@@ -1,12 +1,23 @@
 package com.hyun.udong.member.domain;
 
+import static lombok.AccessLevel.PROTECTED;
+
 import com.hyun.udong.common.entity.BaseTimeEntity;
 import com.hyun.udong.travelschedule.domain.TravelSchedule;
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
@@ -31,8 +42,6 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
-    private String refreshToken;
-
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_schedule_id")
     private TravelSchedule travelSchedule;
@@ -42,10 +51,6 @@ public class Member extends BaseTimeEntity {
         this.socialType = socialType;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public void updateTravelSchedule(TravelSchedule travelSchedule) {

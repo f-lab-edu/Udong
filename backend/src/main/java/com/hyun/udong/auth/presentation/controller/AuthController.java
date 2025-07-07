@@ -4,10 +4,7 @@ import com.hyun.udong.auth.application.service.AuthService;
 import com.hyun.udong.auth.presentation.dto.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +23,11 @@ public class AuthController {
     public ResponseEntity<LoginResponse> refreshTokens(@RequestParam("refreshToken") final String refreshToken) {
         LoginResponse loginResponse = authService.refreshTokens(refreshToken);
         return ResponseEntity.ok().body(loginResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestParam("refreshToken") final String refreshToken) {
+        authService.logout(refreshToken);
+        return ResponseEntity.noContent().build();
     }
 }

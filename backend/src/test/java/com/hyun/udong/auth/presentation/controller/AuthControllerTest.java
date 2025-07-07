@@ -1,5 +1,6 @@
 package com.hyun.udong.auth.presentation.controller;
 
+import com.hyun.udong.auth.application.service.RefreshTokenService;
 import com.hyun.udong.auth.infrastructure.client.KakaoOAuthClient;
 import com.hyun.udong.auth.presentation.dto.KakaoProfileResponse;
 import com.hyun.udong.auth.presentation.dto.KakaoTokenResponse;
@@ -36,6 +37,9 @@ class AuthControllerTest {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @LocalServerPort
     private int port;
@@ -75,9 +79,6 @@ class AuthControllerTest {
         Member member = memberService.save(new Member(100L, SocialType.KAKAO, "hyun", "profile_image"));
         String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
 
-        member.updateRefreshToken(refreshToken);
-        memberService.save(member);
-
         // when & then
         RestAssured
                 .given().log().all()
@@ -93,5 +94,23 @@ class AuthControllerTest {
                 .body("nickname", equalTo(member.getNickname()))
                 .body("token.accessToken", notNullValue())
                 .body("token.refreshToken", notNullValue());
+    }
+
+    @Test
+    void 로그아웃_요청시_204와_블랙리스트_등록이_정상적으로_동작한다() {
+        // given
+        Long memberId = 12345L;
+        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId);
+        refreshTokenService.save(refreshToken, memberId.toString(), jwtTokenProvider.getTokenExpireTime(refreshToken));
+
+        // when & then
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("refreshToken", refreshToken)
+                .when()
+                .post("/api/auth/logout")
+                .then().log().all()
+                .statusCode(204);
     }
 }

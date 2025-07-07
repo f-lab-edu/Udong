@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,6 +27,7 @@ public class AuthService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public LoginResponse kakaoLogin(String code) {
@@ -37,7 +39,8 @@ public class AuthService {
 
         String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
         String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
-        updateRefreshToken(member.getId(), refreshToken);
+        LocalDateTime refreshTokenExpireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
+        refreshTokenService.save(refreshToken, member.getId().toString(), refreshTokenExpireTime);
 
         AuthTokens authTokens = new AuthTokens(accessToken, jwtTokenProvider.getTokenExpireTime(accessToken), refreshToken, jwtTokenProvider.getTokenExpireTime(refreshToken));
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
@@ -45,16 +48,32 @@ public class AuthService {
 
     @Transactional
     public LoginResponse refreshTokens(String refreshToken) {
+        if (refreshTokenService.isBlacklisted(refreshToken)) {
+            throw InvalidTokenException.EXCEPTION;
+        }
+        if (!refreshTokenService.isValid(refreshToken)) {
+            throw InvalidTokenException.EXCEPTION;
+        }
         Long memberId = extractMemberId(refreshToken);
 
-        validateIsTokenOwner(refreshToken, memberId);
+        // 기존 토큰 블랙리스트 등록 및 삭제
+        LocalDateTime expireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
+        long ttlMillis = java.time.Duration.between(LocalDateTime.now(), expireTime).toMillis();
+        if (ttlMillis > 0) {
+            refreshTokenService.addToBlacklist(refreshToken, ttlMillis);
+        }
+        refreshTokenService.delete(refreshToken);
 
+        // 새 토큰 발급 및 저장
         String newAccessToken = jwtTokenProvider.generateAccessToken(memberId);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
+        LocalDateTime newRefreshTokenExpireTime = jwtTokenProvider.getTokenExpireTime(newRefreshToken);
+        refreshTokenService.save(newRefreshToken, memberId.toString(), newRefreshTokenExpireTime);
 
-        Member member = updateRefreshToken(memberId, newRefreshToken);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("해당하는 회원이 존재하지 않습니다."));
 
-        AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getTokenExpireTime(newAccessToken), newRefreshToken, jwtTokenProvider.getTokenExpireTime(newRefreshToken));
+        AuthTokens authTokens = new AuthTokens(newAccessToken, jwtTokenProvider.getTokenExpireTime(newAccessToken), newRefreshToken, newRefreshTokenExpireTime);
         return new LoginResponse(member.getId(), member.getNickname(), authTokens);
     }
 
@@ -68,26 +87,19 @@ public class AuthService {
         return memberId;
     }
 
-    private void validateIsTokenOwner(String refreshToken, Long memberId) {
-        Long ownerId = memberRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> InvalidTokenException.EXCEPTION)
-                .getId();
-
-        if (!ownerId.equals(memberId)) {
-            throw InvalidTokenException.EXCEPTION;
-        }
-    }
-
-    private Member updateRefreshToken(Long memberId, String refreshToken) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("해당하는 회원이 존재하지 않습니다."));
-        member.updateRefreshToken(refreshToken);
-        return member;
-    }
-
     public Member findMemberFromToken(String token) {
         Long memberId = Long.parseLong(jwtTokenProvider.getSubjectFromToken(token));
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> InvalidTokenException.EXCEPTION);
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        LocalDateTime expireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
+        long ttlMillis = java.time.Duration.between(LocalDateTime.now(), expireTime).toMillis();
+        if (ttlMillis > 0) {
+            refreshTokenService.addToBlacklist(refreshToken, ttlMillis);
+        }
+        refreshTokenService.delete(refreshToken);
     }
 }
