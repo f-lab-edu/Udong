@@ -16,16 +16,18 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-    env_file:
-      - .env.prod
+      - redis
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: ${DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
 
   postgres:
     image: postgres:15
-    container_name: postgres
+    container_name: postgres-prod
     deploy:
       resources:
         limits:
@@ -36,22 +38,18 @@ services:
           memory: 1024M
     ports:
       - "5433:5432"
-    env_file:
-      - .env.prod
     environment:
       POSTGRES_DB: hyn
       POSTGRES_USER: ${DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_prod:/var/lib/postgresql/data
 
   postgres-exporter:
     container_name: postgres-exporter
     image: prometheuscommunity/postgres-exporter
     ports:
       - "9187:9187"
-    env_file:
-      - .env.prod
     environment:
       DATA_SOURCE_NAME: "postgresql://${DATASOURCE_USERNAME}:${DATASOURCE_PASSWORD}@postgres:5432/hyn?sslmode=disable"
     depends_on:
@@ -59,12 +57,12 @@ services:
 
   redis:
     image: redis:7
-    container_name: redis
+    container_name: redis-prod
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis_data_prod:/data
 
 volumes:
-  postgres_data:
-  redis_data:
+  postgres_data_prod:
+  redis_data_prod:
