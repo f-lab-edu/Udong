@@ -27,10 +27,20 @@ public class RefreshTokenService {
     }
 
     public boolean isValid(String refreshToken) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(refreshToken));
+        return redisTemplate.hasKey(refreshToken);
     }
 
     public String getUserId(String refreshToken) {
         return redisTemplate.opsForValue().get(refreshToken);
     }
-} 
+
+    public void addToBlacklist(String refreshToken, long ttlMillis) {
+        String blacklistKey = "blacklist:" + refreshToken;
+        redisTemplate.opsForValue().set(blacklistKey, "logout", ttlMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public boolean isBlacklisted(String refreshToken) {
+        String blacklistKey = "blacklist:" + refreshToken;
+        return redisTemplate.hasKey(blacklistKey);
+    }
+}

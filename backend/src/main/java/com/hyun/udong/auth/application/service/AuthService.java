@@ -1,10 +1,5 @@
 package com.hyun.udong.auth.application.service;
 
-import java.time.LocalDateTime;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.hyun.udong.auth.exception.InvalidTokenException;
 import com.hyun.udong.auth.infrastructure.client.KakaoOAuthClient;
 import com.hyun.udong.auth.presentation.dto.AuthTokens;
@@ -17,8 +12,11 @@ import com.hyun.udong.member.application.service.MemberService;
 import com.hyun.udong.member.domain.Member;
 import com.hyun.udong.member.domain.SocialType;
 import com.hyun.udong.member.infrastructure.repository.MemberRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,12 +48,20 @@ public class AuthService {
 
     @Transactional
     public LoginResponse refreshTokens(String refreshToken) {
+        if (refreshTokenService.isBlacklisted(refreshToken)) {
+            throw InvalidTokenException.EXCEPTION;
+        }
         if (!refreshTokenService.isValid(refreshToken)) {
             throw InvalidTokenException.EXCEPTION;
         }
         Long memberId = extractMemberId(refreshToken);
 
-        // 기존 토큰 삭제
+        // 기존 토큰 블랙리스트 등록 및 삭제
+        LocalDateTime expireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
+        long ttlMillis = java.time.Duration.between(LocalDateTime.now(), expireTime).toMillis();
+        if (ttlMillis > 0) {
+            refreshTokenService.addToBlacklist(refreshToken, ttlMillis);
+        }
         refreshTokenService.delete(refreshToken);
 
         // 새 토큰 발급 및 저장
@@ -87,7 +93,13 @@ public class AuthService {
                 .orElseThrow(() -> InvalidTokenException.EXCEPTION);
     }
 
+    @Transactional
     public void logout(String refreshToken) {
+        LocalDateTime expireTime = jwtTokenProvider.getTokenExpireTime(refreshToken);
+        long ttlMillis = java.time.Duration.between(LocalDateTime.now(), expireTime).toMillis();
+        if (ttlMillis > 0) {
+            refreshTokenService.addToBlacklist(refreshToken, ttlMillis);
+        }
         refreshTokenService.delete(refreshToken);
     }
 }
