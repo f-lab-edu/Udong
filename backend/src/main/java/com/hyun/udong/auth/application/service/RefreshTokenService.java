@@ -27,7 +27,7 @@ public class RefreshTokenService {
     }
 
     public boolean isValid(String refreshToken) {
-        return redisTemplate.hasKey(refreshToken);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(refreshToken));
     }
 
     public String getUserId(String refreshToken) {
@@ -41,6 +41,6 @@ public class RefreshTokenService {
 
     public boolean isBlacklisted(String refreshToken) {
         String blacklistKey = "blacklist:" + refreshToken;
-        return redisTemplate.hasKey(blacklistKey);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(blacklistKey));
     }
 }
