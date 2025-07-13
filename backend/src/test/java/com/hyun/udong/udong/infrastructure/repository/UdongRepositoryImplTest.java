@@ -1,10 +1,10 @@
 package com.hyun.udong.udong.infrastructure.repository;
 
-import com.hyun.udong.common.config.QueryDslConfig;
-import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
-import com.hyun.udong.udong.domain.*;
-import com.hyun.udong.udong.infrastructure.repository.participant.ParticipantRepository;
-import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.hyun.udong.common.config.QueryDslConfig;
+import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
+import com.hyun.udong.udong.domain.AttachedTags;
+import com.hyun.udong.udong.domain.Content;
+import com.hyun.udong.udong.domain.RecruitPlanner;
+import com.hyun.udong.udong.domain.TravelCity;
+import com.hyun.udong.udong.domain.TravelPlanner;
+import com.hyun.udong.udong.domain.Udong;
+import com.hyun.udong.udong.infrastructure.repository.participant.ParticipantRepository;
+import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
@@ -83,4 +89,13 @@ class UdongRepositoryImplTest {
         assertThat(travelCities.get(1).getCity().getId()).isEqualTo(2L);
     }
 
+    @Test
+    void 우동을_삭제하면_데이터가_존재하지_않는다() {
+        Udong udong = udongRepository.findAll().get(0);
+        Long udongId = udong.getId();
+
+        udongRepository.deleteById(udongId);
+
+        assertThat(udongRepository.findById(udongId)).isEmpty();
+    }
 }

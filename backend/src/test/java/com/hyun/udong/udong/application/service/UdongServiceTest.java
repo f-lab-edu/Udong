@@ -1,5 +1,23 @@
 package com.hyun.udong.udong.application.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hyun.udong.common.dto.PagedResponse;
 import com.hyun.udong.common.exception.NotFoundException;
 import com.hyun.udong.common.util.DataCleanerExtension;
@@ -18,23 +36,6 @@ import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
 import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
 import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
 import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 @ExtendWith(DataCleanerExtension.class)
 @SpringBootTest
@@ -301,5 +302,25 @@ class UdongServiceTest {
         // then
         boolean isExistsWaitingMember = waitingMemberRepository.existsByUdongAndMemberId(udong, requestMember.getId());
         assertThat(isExistsWaitingMember).isFalse();
+    }
+
+    @Test
+    void 모임장이_우동을_삭제할_수_있다() {
+        Long udongId = udong.getId();
+
+        udongService.deleteUdong(udongId, owner.getId());
+
+        assertThatThrownBy(() -> udongRepository.findById(udongId).orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다.")))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void 모임장이_아닌_사용자가_우동을_삭제하면_예외가_발생한다() {
+        Member notOwner = memberRepository.save(new Member(99L, SocialType.KAKAO, "비모임장", "https://notowner.com"));
+        Long udongId = udong.getId();
+
+        assertThatThrownBy(() -> udongService.deleteUdong(udongId, notOwner.getId()))
+                .isInstanceOf(InvalidParticipationException.class)
+                .hasMessage("승인/거부할 권한이 없습니다.");
     }
 }
