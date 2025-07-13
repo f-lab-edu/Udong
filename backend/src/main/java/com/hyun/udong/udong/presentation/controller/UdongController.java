@@ -1,5 +1,16 @@
 package com.hyun.udong.udong.presentation.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.hyun.udong.common.annotation.LoginMember;
 import com.hyun.udong.common.dto.PagedResponse;
 import com.hyun.udong.member.domain.Member;
@@ -10,11 +21,9 @@ import com.hyun.udong.udong.presentation.dto.response.ApprovedParticipantRespons
 import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
 import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
 import com.hyun.udong.udong.presentation.dto.response.WaitingMemberResponse;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -55,6 +64,13 @@ public class UdongController {
                                                   @PathVariable("waitingMemberId") Long waitingMemberId,
                                                   @LoginMember Member member) {
         udongService.rejectParticipant(udongId, waitingMemberId, member.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{udongId}")
+    public ResponseEntity<Void> deleteUdong(@PathVariable("udongId") Long udongId,
+                                            @LoginMember Member member) {
+        udongService.deleteUdong(udongId, member.getId());
         return ResponseEntity.noContent().build();
     }
 }

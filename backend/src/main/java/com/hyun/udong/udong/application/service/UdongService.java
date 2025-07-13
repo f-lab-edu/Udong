@@ -1,20 +1,9 @@
 package com.hyun.udong.udong.application.service;
 
-import com.hyun.udong.common.dto.PagedResponse;
-import com.hyun.udong.common.exception.NotFoundException;
-import com.hyun.udong.member.domain.Member;
-import com.hyun.udong.member.infrastructure.repository.MemberRepository;
-import com.hyun.udong.travelschedule.domain.City;
-import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
-import com.hyun.udong.udong.domain.*;
-import com.hyun.udong.udong.exception.InvalidParticipationException;
-import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
-import com.hyun.udong.udong.infrastructure.repository.participant.ParticipantRepository;
-import com.hyun.udong.udong.infrastructure.repository.waitingmember.WaitingMemberRepository;
-import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
-import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
-import com.hyun.udong.udong.presentation.dto.response.*;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +13,32 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.hyun.udong.common.dto.PagedResponse;
+import com.hyun.udong.common.exception.NotFoundException;
+import com.hyun.udong.member.domain.Member;
+import com.hyun.udong.member.infrastructure.repository.MemberRepository;
+import com.hyun.udong.travelschedule.domain.City;
+import com.hyun.udong.travelschedule.infrastructure.repository.CityRepository;
+import com.hyun.udong.udong.domain.AttachedTags;
+import com.hyun.udong.udong.domain.Content;
+import com.hyun.udong.udong.domain.Participant;
+import com.hyun.udong.udong.domain.RecruitPlanner;
+import com.hyun.udong.udong.domain.TravelPlanner;
+import com.hyun.udong.udong.domain.Udong;
+import com.hyun.udong.udong.domain.WaitingMember;
+import com.hyun.udong.udong.exception.InvalidParticipationException;
+import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
+import com.hyun.udong.udong.infrastructure.repository.participant.ParticipantRepository;
+import com.hyun.udong.udong.infrastructure.repository.waitingmember.WaitingMemberRepository;
+import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
+import com.hyun.udong.udong.presentation.dto.request.FindUdongsCondition;
+import com.hyun.udong.udong.presentation.dto.response.ApprovedParticipantResponse;
+import com.hyun.udong.udong.presentation.dto.response.CreateUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.ParticipantCountResponse;
+import com.hyun.udong.udong.presentation.dto.response.SimpleUdongResponse;
+import com.hyun.udong.udong.presentation.dto.response.WaitingMemberResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +115,14 @@ public class UdongService {
 
         WaitingMember waitingMember = findWaitingMember(waitingMemberId, udong);
         waitingMemberRepository.delete(waitingMember);
+    }
+
+    @Transactional
+    public void deleteUdong(Long udongId, Long memberId) {
+        Udong udong = udongRepository.findById(udongId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 우동입니다."));
+        udong.validateOwner(memberId);
+        udongRepository.deleteById(udongId);
     }
 
     private List<ParticipantCountResponse> getParticipantCounts(List<Udong> udongs) {

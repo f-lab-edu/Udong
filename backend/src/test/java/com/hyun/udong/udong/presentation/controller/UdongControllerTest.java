@@ -1,5 +1,24 @@
 package com.hyun.udong.udong.presentation.controller;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+
 import com.hyun.udong.common.fixture.TestOauth;
 import com.hyun.udong.common.util.DataCleanerExtension;
 import com.hyun.udong.member.domain.Member;
@@ -13,21 +32,9 @@ import com.hyun.udong.udong.infrastructure.repository.UdongRepository;
 import com.hyun.udong.udong.infrastructure.repository.participant.ParticipantRepository;
 import com.hyun.udong.udong.infrastructure.repository.waitingmember.WaitingMemberRepository;
 import com.hyun.udong.udong.presentation.dto.request.CreateUdongRequest;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
 
 @ExtendWith(DataCleanerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -381,6 +388,34 @@ class UdongControllerTest {
                 .when()
                 .post("/api/udongs/{udongId}/approve/{waitingMemberId}", udong.getId(), waitingMember.getId())
 
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void 모임장이_우동을_삭제하면_204를_반환한다() {
+        Long udongId = udong.getId();
+
+        RestAssured
+                .given().log().all()
+                .header("Authorization", ownerToken)
+                .when()
+                .delete("/api/udongs/{udongId}", udongId)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void 모임장이_아닌_사용자가_우동을_삭제하면_실패한다() {
+        Member notOwner = memberRepository.save(new Member(99L, SocialType.KAKAO, "비모임장", "https://notowner.com"));
+        String notOwnerToken = testOauth.generateAccessToken(notOwner.getId());
+        Long udongId = udong.getId();
+
+        RestAssured
+                .given().log().all()
+                .header("Authorization", notOwnerToken)
+                .when()
+                .delete("/api/udongs/{udongId}", udongId)
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
